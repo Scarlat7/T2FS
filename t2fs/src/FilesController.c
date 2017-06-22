@@ -1,5 +1,5 @@
-#include "../FilesController.h"
-#include "../t2fs.h"
+#include "FilesController.h"
+#include "t2fs.h"
 
 #include <string.h>
 #include <stdio.h>
