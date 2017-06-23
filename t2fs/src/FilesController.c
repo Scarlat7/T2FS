@@ -11,7 +11,7 @@ int isValidName(char *name){
     if(strlen(name) > 51 || strlen(name) < 0) return 1;
     for(i = 0; i<strlen(name); i++) {
         atual = name[i];
-        if(atual < 'A' || atual > 'z') return 1;
+        if((atual < 'A' || atual > 'z') && (atual <'0' || atual > '9') && atual != '.') return 1;
     }
     return 0;
 }
