@@ -1,4 +1,5 @@
 #include "FilesController.h"
+#include "BootController.h"
 #include "t2fs.h"
 #include "apidisk.h"
 
@@ -9,28 +10,32 @@
 int isValidName(char *name){
     char current;
     int i = 0;
-    if(strlen(name) > 51 || strlen(name) < 0) return -1;
+    if(strlen(name) > 51 || strlen(name) < 0) return 1;
     for(i = 0; i<strlen(name); i++) {
         current = name[i];
-        if((current < 'A' || current > 'z') && (current <'0' || current > '9') && current != '.') return -1;
+        if((current < 'A' || current > 'z') && (current <'0' || current > '9') && current != '.') return 1;
     }
     return 0;
 }
 
 //Função que imprime o conteúdo de um diretório, dado seu setor e tamanho em bytes
 //Ainda não testada
+/*
 int printDirectory(unsigned int sector, DWORD bytesFileSize){
-    unsigned char buffer[SECTOR_SIZE];
+    	unsigned char buffer[SECTOR_SIZE];
 	int index = 0;
 	int numberOfRegisters, numberOfSectors;
-    t2fs_record current;
+    	t2fs_record current;
 
+	current = malloc(sizeof(t2fs_record));
+
+	
 	if(ctrl == NULL){
-        init_lib();
-        return -1;
+        	init_lib();
+        	return -1;
 	}
 
-    numberOfRegisters = bytesFileSize/64; //Diretórios são sempre múltiplos de 64, logo arredondamento não é necessário.
+    	numberOfRegisters = bytesFileSize/64; //Diretórios são sempre múltiplos de 64, logo arredondamento não é necessário.
     numberOfSectors = numberOfRegisters/4;
     if(numberOfRegisters%4 != 0) numberOfSectors++;
 
@@ -43,8 +48,8 @@ int printDirectory(unsigned int sector, DWORD bytesFileSize){
         do {
             memcpy(&current.TypeVal, buffer+index, sizeof(BYTE));
             index += sizeof(BYTE);
-            memcpy(&current.name, buffer+index, MAX_FILE_NAME_SIZE*sizeof(CHAR));
-            index += MAX_FILE_NAME_SIZE*sizeof(CHAR);
+            memcpy(&current.name, buffer+index, MAX_FILE_NAME_SIZE*sizeof(char));
+            index += MAX_FILE_NAME_SIZE*sizeof(char);
             memcpy(&current.blocksFileSize, buffer+index, sizeof(DWORD));
             index += sizeof(DWORD);
             memcpy(&current.bytesFileSize, buffer+index, sizeof(DWORD));
@@ -59,3 +64,4 @@ int printDirectory(unsigned int sector, DWORD bytesFileSize){
     }while(numberOfSectors != 0);
     return 0;
 }
+*/

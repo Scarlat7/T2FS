@@ -13,4 +13,4 @@
 int isValidName(char *name);
 
 /*Prints the contents of sector */
-void printDirectory(unsigned int sector);
+//void printDirectory(unsigned int sector);
