@@ -32,3 +32,11 @@ int map_VBN(DWORD MFT, DWORD VBN, DWORD* LBN);
 ** 	      [OUT - BYTE*] buffer - buffer in which the data will be put
 */
 int read_block_file(DWORD currentPointer, int nBlocks, BYTE* buffer);
+
+/* Reads search specific MFT and returns it
+** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
+** @RETURN:	0 - if executed without errors 
+**		-1 - in case of any error
+** @ARGUMENTS: 	register number
+*/
+int searchMFT(int numReg, struct t2fs_4tupla* vector);

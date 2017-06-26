@@ -18,6 +18,29 @@ int isValidName(char *name){
     return 0;
 }
 
+
+/*
+t2fs_MFT searchFile(t2fs_MFT current, char *file) {
+	//Pega blocos do diretório apontado por current
+	//Procura por nome dado por file
+	//Se não houver, retorna -1
+}
+
+int hasDirectory(char *directories, t2fs_MFT current) {
+	t2fs_MFT nextMFT;
+	if(directories == NULL) return 0;
+	nextMFT = searchFile(current, directories);
+	directories = strtok(NULL, "/");
+	if(nextMFT == -1) return -1;
+	return hasDirectory(directories, next);
+}
+
+int pathExists(char *pathName) {
+	char *directories = strtok(pathName, "/");
+	t2fs_MFT MFTRoot = ctrl.MFTRoot;
+	return hasDirectory(directories, MFTRoot);
+}
+
 //Função que imprime o conteúdo de um diretório, dado seu setor e tamanho em bytes
 //Ainda não testada
 /*
