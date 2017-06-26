@@ -14,7 +14,7 @@ int searchMFT(int numReg, struct t2fs_4tupla *vector) {
 	int i = 0, index = 0;
 	if(read_sector(ctrl.boot.blockSize + 2*numReg, buffer1)) return -1;
 	if(read_sector(ctrl.boot.blockSize + 2*numReg + 1, buffer2)) return -1;
-	for(i=0; i<32; i++) {
+	for(i=0; i<16; i++) {
 		memcpy(&vector[i].atributeType, buffer1 + index, sizeof(DWORD));
 		index += sizeof(DWORD);
 		memcpy(&vector[i].virtualBlockNumber, buffer1 + index, sizeof(DWORD));
@@ -25,7 +25,7 @@ int searchMFT(int numReg, struct t2fs_4tupla *vector) {
 		index += sizeof(DWORD);
 	}
 	index = 0;
-	for(i=32; i<64; i++) {
+	for(i=16; i<32; i++) {
 		memcpy(&vector[i].atributeType, buffer2 + index, sizeof(DWORD));
 		index += sizeof(DWORD);
 		memcpy(&vector[i].virtualBlockNumber, buffer2 + index, sizeof(DWORD));

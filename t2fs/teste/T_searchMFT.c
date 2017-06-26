@@ -4,7 +4,7 @@
 #include "t2fs.h"
 
 int main(){
-	struct t2fs_4tupla MFT[64];
+	struct t2fs_4tupla MFT[32];
 
 	if(init_lib() != 0 )
 		printf("Falha na init_lib.\n");
