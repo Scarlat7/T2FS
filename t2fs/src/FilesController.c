@@ -1,5 +1,6 @@
 #include "FilesController.h"
 #include "BootController.h"
+#include "TuplesController.h"
 #include "t2fs.h"
 #include "apidisk.h"
 
@@ -18,6 +19,47 @@ int isValidName(char *name){
     return 0;
 }
 
+int allocateBlock(struct t2fs_4tupla *vector){
+	int block, newVBN;
+	int i = 0, found = 0;
+	struct t2fs_4tupla newTuplas;
+
+	block = searchBitmap2(0);
+	if(block == 0) return -1;
+	if(setBitmap2(block, 1);
+	do {
+		if(vector[i].atributeType == 0) {
+			if(i > 0) i--;
+			found = 1;
+		}
+		else i++;
+	}while(i < 32 && !found);
+
+	//Chegou ao fim da cadeia de tuplas
+	if(!found) {
+		//Tem bloco contíguo
+		if(vector[31].logicalBlockNumber + vector[31].numberOfContiguosBlocks == block){
+			vector[31].numberOfContiguosBlocks ++;
+			return 0;
+		}
+		
+		//Não tem bloco contíguo (aloca um novo registro)
+		newVBN = vector[i-1].virtualBlockNumber + vector[i-1].numberOfContiguosBlocks;
+		//newTupla(vector, newVBN); //Natáaaaaaalia! Preciso que tu faça essa, pfv
+		return 0;
+	}
+
+	//Achou o fim da tupla
+	//Tem bloco contíguo
+	if(vector[i].logicalBlockNumber + vector[i].numberOfContiguosBlocks == block){
+		vector[i].numberOfContiguosBlocks ++;
+		return 0;
+	}
+	//Não tem bloco contíguo
+	newVBN = vector[i].virtualBlockNumber + vector[i].numberOfContiguosBlocks;
+	//newTupla(vector, newVBN);
+	return 0;	
+}
 
 /*
 t2fs_MFT searchFile(t2fs_MFT current, char *file) {
@@ -43,7 +85,6 @@ int pathExists(char *pathName) {
 
 //Função que imprime o conteúdo de um diretório, dado seu setor e tamanho em bytes
 //Ainda não testada
-/*
 int printDirectory(unsigned int sector, DWORD bytesFileSize){
     	unsigned char buffer[SECTOR_SIZE];
 	int index = 0;

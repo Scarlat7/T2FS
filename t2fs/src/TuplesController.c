@@ -24,6 +24,7 @@ int searchMFT(int numReg, struct t2fs_4tupla *vector) {
 		memcpy(&vector[i].numberOfContiguosBlocks, buffer1 + index, sizeof(DWORD));
 		index += sizeof(DWORD);
 	}
+	printf("Validade: %d\nVBN: %d\tLBN: %d\nNumCB: %d\n", vector[0].atributeType, vector[0].virtualBlockNumber, vector[0].logicalBlockNumber, vector[0].numberOfContiguosBlocks);
 	index = 0;
 	for(i=16; i<32; i++) {
 		memcpy(&vector[i].atributeType, buffer2 + index, sizeof(DWORD));

@@ -19,7 +19,7 @@
 **	      [IN - DWORD] VBN - Virtual Block Number to be mapped
 ** 	      [OUT - DWORD] LBN - Logical Block Number mapping
 */
-int map_VBN(DWORD MFT, DWORD VBN, DWORD* LBN);
+int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN);
 
 /* Reads the requested blocks from file on disk
 ** If current pointer points to the middle of a block, that block will be read and
@@ -31,12 +31,21 @@ int map_VBN(DWORD MFT, DWORD VBN, DWORD* LBN);
 **	      [IN - int] nBlocks - number of blocks to be read
 ** 	      [OUT - BYTE*] buffer - buffer in which the data will be put
 */
-int read_block_file(DWORD currentPointer, int nBlocks, BYTE* buffer);
+int readBlockFile(DWORD currentPointer, int nBlocks, BYTE* buffer);
 
-/* Reads search specific MFT and returns it
+/* Searches specific MFT and returns it
 ** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
 ** @RETURN:	0 - if executed without errors 
 **		-1 - in case of any error
 ** @ARGUMENTS: 	register number
 */
 int searchMFT(int numReg, struct t2fs_4tupla* vector);
+
+/* Adds a new tuple to the vector passed as parameter
+** Main author: 
+** @RETURN:	0, if executed without errors
+** 		-1, in case of any error
+** @ARGUMENTS:	vector of tuples and the VBN number (-1, if it needs to create a new **		register)
+*/
+int newTuple(struct t2fs_4tupla vector, int newVBN);
+

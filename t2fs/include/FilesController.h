@@ -8,9 +8,13 @@
 *******************************/
 
 #include <stdio.h>
+#include "t2fs.h"
 
 /* Verifies if the name passed as parameter is valid */
 int isValidName(char *name);
+
+/*Alloc one block to an file*/
+int allocateBlock(struct t2fs_4tupla *vector);
 
 /*Prints the contents of sector */
 //void printDirectory(unsigned int sector);
