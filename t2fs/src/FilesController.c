@@ -37,25 +37,25 @@ int allocateBlock(struct t2fs_4tupla *vector){
 
 	//Chegou ao fim da cadeia de tuplas
 	if(!found) {
-		//Tem bloco contÌguo
+		//Tem bloco cont√≠guo
 		if(vector[31].logicalBlockNumber + vector[31].numberOfContiguosBlocks == block){
 			vector[31].numberOfContiguosBlocks ++;
 			return 0;
 		}
 		
-		//N„o tem bloco contÌguo (aloca um novo registro)
+		//N√£o tem bloco cont√≠guo (aloca um novo registro)
 		newVBN = vector[i-1].virtualBlockNumber + vector[i-1].numberOfContiguosBlocks;
-		//newTupla(vector, newVBN); //Nat·aaaaaalia! Preciso que tu faÁa essa, pfv
+		//newTupla(vector, newVBN); //Nat√°aaaaaalia! Preciso que tu fa√ßa essa, pfv
 		return 0;
 	}
 
 	//Achou o fim da tupla
-	//Tem bloco contÌguo
+	//Tem bloco cont√≠guo
 	if(vector[i].logicalBlockNumber + vector[i].numberOfContiguosBlocks == block){
 		vector[i].numberOfContiguosBlocks ++;
 		return 0;
 	}
-	//N„o tem bloco contÌguo
+	//N√£o tem bloco cont√≠guo
 	newVBN = vector[i].virtualBlockNumber + vector[i].numberOfContiguosBlocks;
 	//newTupla(vector, newVBN);
 	return 0;	
@@ -63,28 +63,25 @@ int allocateBlock(struct t2fs_4tupla *vector){
 
 /*
 t2fs_MFT searchFile(t2fs_MFT current, char *file) {
-	//Pega blocos do diretÛrio apontado por current
+	//Pega blocos do diret√≥rio apontado por current
 	//Procura por nome dado por file
-	//Se n„o houver, retorna -1
+	//Se n√£o houver, retorna -1
 }
 
-int hasDirectory(char *directories, t2fs_MFT current) {
-	t2fs_MFT nextMFT;
-	if(directories == NULL) return 0;
-	nextMFT = searchFile(current, directories);
-	directories = strtok(NULL, "/");
-	if(nextMFT == -1) return -1;
-	return hasDirectory(directories, next);
+int hasDirectory(char *directories, int currentReg) {
+	//procura pelo primeiro diret√≥rio
+	//se n√£o estiver na primeira cadeia de tuplas, pega a pr√≥xima
+	//se chegar ao fim e n√£o encontrar, retorna erro
+	//se encontrar, passa registro no mft como par√¢metro (recurs√£o)
 }
 
 int pathExists(char *pathName) {
-	char *directories = strtok(pathName, "/");
-	t2fs_MFT MFTRoot = ctrl.MFTRoot;
-	return hasDirectory(directories, MFTRoot);
+	//Pega path e tokeniza
+	//passa o registro 1 como par√¢metro
 }
 
-//FunÁ„o que imprime o conte˙do de um diretÛrio, dado seu setor e tamanho em bytes
-//Ainda n„o testada
+//Fun√ß√£o que imprime o conte√∫do de um diret√≥rio, dado seu setor e tamanho em bytes
+//Ainda n√£o testada
 int printDirectory(unsigned int sector, DWORD bytesFileSize){
     	unsigned char buffer[SECTOR_SIZE];
 	int index = 0;
@@ -99,7 +96,7 @@ int printDirectory(unsigned int sector, DWORD bytesFileSize){
         	return -1;
 	}
 
-    	numberOfRegisters = bytesFileSize/64; //DiretÛrios s„o sempre m˙ltiplos de 64, logo arredondamento n„o È necess·rio.
+    	numberOfRegisters = bytesFileSize/64; //Diret√≥rios s√£o sempre m√∫ltiplos de 64, logo arredondamento n√£o √© necess√°rio.
     numberOfSectors = numberOfRegisters/4;
     if(numberOfRegisters%4 != 0) numberOfSectors++;
 
