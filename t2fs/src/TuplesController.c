@@ -51,7 +51,7 @@ int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
 	t2fs_4tupla bufferT[SECTOR_SIZE/sizeof(t2fs_4tupla)];
 
 	int currentMFT = ctrl.OpenFilesArray[fileHandle].MFT;
-	/*
+	
 	j = 0;
 	do{
 		if(read_sector(RegisterToSector(currentMFT)+j, buffer) != 0){
@@ -89,7 +89,6 @@ int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
 		}
 		 
 	}while(found != 1);
-	*/
 
 	return -1;
 }

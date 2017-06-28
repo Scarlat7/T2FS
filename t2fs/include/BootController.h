@@ -13,8 +13,8 @@
 typedef struct s_Control {
 	
 	struct t2fs_bootBlock boot;
-	//struct TDAA OpenFilesArray
-	//struct TDAA OpenDirectoriesArray/List	
+	//struct TDAA OpenFilesArray (struct TDAA should have fileBytesSize, dirty bit, MFT, currentPointer
+	//struct TDAA OpenDirectoriesArray/List	 (Directory should have MFT, dirty bit, fileBytesSize, currentEntry)
 	int N_OpenFiles;
 
 } t_control;

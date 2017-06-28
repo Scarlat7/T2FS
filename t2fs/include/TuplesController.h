@@ -21,17 +21,17 @@
 */
 int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN);
 
-/* Reads the requested blocks from file on disk
-** If current pointer points to the middle of a block, that block will be read and
-** counted as a block in "nBlocks"
+/* Reads the requested sectors from file on disk
+** If current pointer points to the middle of a sector, that sector will be read and
+** counted as a sector in "nSectors"
 ** Main author: NATÁLIA GUBIANI RAMPON - 00262502
 ** @RETURN: 0 - if executed without errors
 **          -1 - error
-** @ARGUMENTS:[IN - DWORD] currentPointer - file current pointer to decide which blocks will be read 
-**	      [IN - int] nBlocks - number of blocks to be read
+** @ARGUMENTS:[IN - FILE2] fileHandle - file handle of current file being read 
+**	      [IN - int] nSectors - number of sectors to be read
 ** 	      [OUT - BYTE*] buffer - buffer in which the data will be put
 */
-int readBlockFile(DWORD currentPointer, int nBlocks, BYTE* buffer);
+int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer);
 
 /* Searches specific MFT and returns it
 ** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
