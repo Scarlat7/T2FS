@@ -47,14 +47,15 @@ int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
 	DWORD sector;
 	DWORD startVirtualBlock, block;
 	int i, j, k;
-	BYTE found = 0, bufferS[SECTOR_SIZE];
+	int remaining = 0;
+	BYTE bufferS[SECTOR_SIZE];
 	t2fs_4tupla bufferT[SECTOR_SIZE/sizeof(t2fs_4tupla)];
 
 	int currentMFT = ctrl.OpenFilesArray[fileHandle].MFT;
 	
 	j = 0;
 	do{
-		if(read_sector(RegisterToSector(currentMFT)+j, buffer) != 0){
+		if(read_sector(RegisterToSector(currentMFT)+j, bufferT) != 0){
 			fprintf(stderr, "Erro ao ler registro MFT do arquivo.\n");
 			return -1;
 		}
@@ -63,21 +64,35 @@ int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
 		
 		i = 0;
 		
-		while(i < SECTOR_SIZE/sizeof(t2fs_4tupla) && found != 1){
+		//loop de leitura do buffer de tuplas de um setor
+		while(i < SECTOR_SIZE/sizeof(t2fs_4tupla) && remaining != nSectors){
 			if(bufferT[i].atributeType == MAPEAMENTO){
-				if((bufferT[i].virtualBlockNumber + bufferT[i].numberOfContiguousBlocks-1) <=  startVirtual && bufferT[i].virtualBlockNumber >= startVirtual){
-					found = 1;
-					for(k = 0; k < nSectors; k++){
-						block = (startVirtualBlock - bufferT[i].virtualBlockNumber)+bufferT[i].logicalBlockNumber;
+				if((bufferT[i].virtualBlockNumber + bufferT[i].numberOfContiguousBlocks-1) >=  startVirtual && bufferT[i].virtualBlockNumber >= startVirtual){
+					//for(k = 0; k < nSectors; k++){
+					k = startVirtualBlock - bufferT[i].virtualBlockNumber;
+					while(remaining != nSectors && k < numberOfContiguousBlocks){
+						block = (startVirtualBlock - bufferT[i].virtualBlockNumber)+bufferT[i].logicalBlockNumber + k;
 						sector = block*ctrl.blockSize;
-						sector += (ctrl.OpenFilesArray[fileHandle].currentPointer%blockSize)/SECTOR_SIZE;
-						read_sector(sector, bufferS);
-						memcpy(buffer+index, bufferS, SECTOR_SIZE);
-						index += SECTOR_SIZE;
+						while(sector%blockSize != 0 && remaining != nSectors){
+							if(!remaining) 
+								sector += (ctrl.OpenFilesArray[fileHandle].currentPointer%blockSize)/SECTOR_SIZE;
+							else	sector++;
+							//read_sector(sector, bufferS);
+							read_sector(sector, buffer+index);
+							remaining++;
+							//memcpy(buffer+index, bufferS, SECTOR_SIZE);
+							index += SECTOR_SIZE;
+						}
+						k++;
 					}
 
 				}
 				i++;
+			}else if(bufferT[i-1].attributeType == FIM_ENCADEAMENTO){
+				if(remaining != nSectors ){
+					fprintf(stderr, "Numero de setores requisitados inexistentes no arquivo.\n");
+					return -1;
+				}
 			}
 		}
 	
@@ -87,10 +102,17 @@ int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
 		}else{
 			j+=1;
 		}
-		 
-	}while(found != 1);
 
-	return -1;
+		if(bufferT[i-1].attributeType == FIM_ENCADEAMENTO){
+			if(remaining != nSectors ){
+				fprintf(stderr, "Numero de setores requisitados inexistentes no arquivo.\n");
+				return -1;
+			}
+		}
+		 
+	}while(remaining != nSectors);
+
+	return 0;
 }
 
 int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
