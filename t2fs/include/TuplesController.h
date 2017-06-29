@@ -10,6 +10,10 @@
 #include <stdio.h>
 #include "t2fs.h"
 
+#define FIM_ENCADEAMENTO 0
+#define MAPEAMENTO 1
+#define MFT_ADICIONAL 2
+
 /* Maps the program Virtual Block Number (VBN) to a disk Logical Block Number
 ** (LBN)
 ** Main author: NATÁLIA GUBIANI RAMPON - 00262502
@@ -25,6 +29,7 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN);
 ** If current pointer points to the middle of a sector, that sector will be read and
 ** counted as a sector in "nSectors"
 ** Main author: NATÁLIA GUBIANI RAMPON - 00262502
+** Co-author:	LEONARDO DA LUZ DORNELES - 00262516
 ** @RETURN: 0 - if executed without errors
 **          -1 - error
 ** @ARGUMENTS:[IN - FILE2] fileHandle - file handle of current file being read 
@@ -48,4 +53,12 @@ int searchMFT(int numReg, struct t2fs_4tupla* vector);
 ** @ARGUMENTS:	vector of tuples and the VBN number (-1, if it needs to create a new **		register)
 */
 int newTuple(struct t2fs_4tupla vector, int newVBN);
+
+/* Gives initial sector of a given MFT register
+** Main author: NATÁLIA GUBIANI RAMPON - 00262502
+** @RETURN: [INT] Initial sector (to be used in read_sector() function )
+** @ARGUMENTS:[IN - DWORD] MFT register 
+*/
+int registerToSector(DWORD MFT);
+
 

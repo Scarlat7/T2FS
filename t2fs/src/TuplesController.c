@@ -7,10 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define FIM_ENCADEAMENTO 0
-#define MAPEAMENTO 1
-#define MFT_ADICIONAL 2
-
 t_control ctrl;
 
 int searchMFT(int numReg, struct t2fs_4tupla *vector) {
@@ -55,7 +51,7 @@ int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
 	
 	j = 0;
 	do{
-		if(read_sector(RegisterToSector(currentMFT)+j, bufferT) != 0){
+		if(read_sector(egisterToSector(currentMFT)+j, bufferT) != 0){
 			fprintf(stderr, "Erro ao ler registro MFT do arquivo.\n");
 			return -1;
 		}
@@ -113,6 +109,16 @@ int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
 	}while(remaining != nSectors);
 
 	return 0;
+}
+
+int registerToSector(DWORD MFT){
+
+	if(MFT > MFTBlocksSize || MFT < 0){
+		fprintf(stderr, "Registro MFT requisitado fora dos limites.\n");i
+		return -1;
+	}
+
+	return (MFT + 1)*blockSize;
 }
 
 int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
