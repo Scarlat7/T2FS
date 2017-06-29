@@ -13,6 +13,8 @@
 /* Verifies if the name passed as parameter is valid */
 int isValidName(char *name);
 
+void printRecords(DWORD reg);
+
 /*Alloc one block to an file*/
 int allocateBlock(struct t2fs_4tupla *vector);
 

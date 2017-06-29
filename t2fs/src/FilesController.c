@@ -63,6 +63,25 @@ int allocateBlock(struct t2fs_4tupla *vector){
 }
 */
 
+void printRecords(DWORD reg) {
+	int i, j, k;
+	struct t2fs_4tupla* tuplas;
+	struct t2fs_record* records;
+
+	do {
+		i = 0;
+		searchMFT(reg, tuplas); //Dá uma falha de segmentação bizarra aqui
+		do {
+			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
+					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) break;
+					for(k=0; k < ctrl.boot.blockSize; k++) printf("Name: %s\tType: %d\nBlocks: %d\tBytes: %d\n", records[k].name, records[k].TypeVal, records[k].blocksFileSize, records[k].bytesFileSize);
+			}
+			i++;
+		}while(tuplas[i].atributeType == 1);
+		reg = tuplas[i].virtualBlockNumber;
+	}while(tuplas[31].atributeType == 2);
+}
+
 //Compila, mas não testei
 DWORD searchFile(struct t2fs_record *records, char *name) {
 	int i;
@@ -98,7 +117,7 @@ DWORD hasFile(char *directories, DWORD currentReg) {
 	if(directories == NULL) return reg;
 
 	do {
-		i == 0;
+		i = 0;
 		searchMFT(reg, tuplas);
 		do {
 			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){

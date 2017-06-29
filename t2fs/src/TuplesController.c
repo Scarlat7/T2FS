@@ -18,8 +18,12 @@ int mapLBN(DWORD LBN, DWORD* sector){
 }
 
 int searchMFT(DWORD numReg, struct t2fs_4tupla *vector) {
+	//Fins de debug
+	printf("Chego até aqui no MFT.\n");
+	printf("BlockSize: %d\tNumReg: %d\tVector: %p\n", ctrl.boot.blockSize, numReg, vector);
+	//Falha de segmentação abaixo
 	if(read_sector(ctrl.boot.blockSize + 2*numReg, (unsigned char*)vector)) return -1;
-	if(read_sector(ctrl.boot.blockSize + 2*numReg + 1, (unsigned char*)vector + SECTOR_SIZE)) return -1;
+	if(read_sector(ctrl.boot.blockSize + 1 + 2*numReg, (unsigned char*)vector + SECTOR_SIZE)) return -1;
 	
 	return 0;
 }
