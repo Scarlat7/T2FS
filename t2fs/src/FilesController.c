@@ -19,6 +19,7 @@ int isValidName(char *name){
     return 0;
 }
 
+/*
 int allocateBlock(struct t2fs_4tupla *vector){
 	int block, newVBN;
 	int i = 0, found = 0;
@@ -60,26 +61,65 @@ int allocateBlock(struct t2fs_4tupla *vector){
 	//newTupla(vector, newVBN);
 	return 0;	
 }
+*/
 
+//Compila, mas não testei
+DWORD searchFile(struct t2fs_record *records, char *name) {
+	int i;
+	for(i=0; i< 4*ctrl.boot.blockSize; i++){
+		if(strcmp(records[i].name, name)) return records[i].MFTNumber;
+	}
+	return -1;
+}
+
+//Compila, mas não testei
+int LBNToRecord(DWORD LBN, struct t2fs_record* records){
+	int i;
+	DWORD index=0;
+	DWORD sector;
+	//Pega o primeiro setor do LB	
+	if(mapLBN(LBN, &sector) < 0) return -1;
+	for(i = 0; i < ctrl.boot.blockSize; i++){
+		if(read_sector(sector + i, (unsigned char*)(records + index))) return -1;
+		index += 4 * sizeof(struct t2fs_record);
+	}
+	return 0;
+}
+
+//Compila, mas não testei
+DWORD hasFile(char *directories, DWORD currentReg) {
+	struct t2fs_4tupla *tuplas;
+	struct t2fs_record *records;
+	int i, j;
+	DWORD reg;
+
+	reg = currentReg;
+
+	if(directories == NULL) return reg;
+
+	do {
+		i == 0;
+		searchMFT(reg, tuplas);
+		do {
+			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
+					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) return -1;
+					reg = searchFile(records, directories);
+					if(reg) return hasFile(strtok(NULL, "/"), reg);
+			}
+			i++;
+		}while(tuplas[i].atributeType == 1);
+		reg = tuplas[i].virtualBlockNumber;
+	}while(tuplas[31].atributeType == 2);	
+	return -1;
+}
+
+//Compila, mas não testei
+DWORD pathExists(char *pathName) {
+	char *directories;
+	directories = strtok(pathName, "/");
+	return hasFile(directories, 0);
+}
 /*
-t2fs_MFT searchFile(t2fs_MFT current, char *file) {
-	//Pega blocos do diretório apontado por current
-	//Procura por nome dado por file
-	//Se não houver, retorna -1
-}
-
-int hasDirectory(char *directories, int currentReg) {
-	//procura pelo primeiro diretório
-	//se não estiver na primeira cadeia de tuplas, pega a próxima
-	//se chegar ao fim e não encontrar, retorna erro
-	//se encontrar, passa registro no mft como parâmetro (recursão)
-}
-
-int pathExists(char *pathName) {
-	//Pega path e tokeniza
-	//passa o registro 1 como parâmetro
-}
-
 //Função que imprime o conteúdo de um diretório, dado seu setor e tamanho em bytes
 //Ainda não testada
 int printDirectory(unsigned int sector, DWORD bytesFileSize){

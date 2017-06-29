@@ -25,6 +25,8 @@
 */
 int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN);
 
+int mapLBN(DWORD LBN, DWORD* sector);
+
 /* Reads the requested sectors from file on disk
 ** If current pointer points to the middle of a sector, that sector will be read and
 ** counted as a sector in "nSectors"
@@ -42,9 +44,21 @@ int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer);
 ** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
 ** @RETURN:	0 - if executed without errors 
 **		-1 - in case of any error
-** @ARGUMENTS: 	register number
+** @ARGUMENTS: 	[IN] register number
+**		[OUT] vector of tuples
 */
-int searchMFT(int numReg, struct t2fs_4tupla* vector);
+int searchMFT(DWORD numReg, struct t2fs_4tupla* vector);
+
+/* Converts LBN into a sector
+** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
+** @RETURN:	0 - if executed without errors 
+**		-1 - in case of any error
+
+** @ARGUMENTS: 	[IN - DWORD] LBN
+**		[OUT - DWORD*] sector
+
+*/
+int mapLBN(DWORD LBN, DWORD* sector);
 
 /* Adds a new tuple to the vector passed as parameter
 ** Main author: 
@@ -52,7 +66,7 @@ int searchMFT(int numReg, struct t2fs_4tupla* vector);
 ** 		-1, in case of any error
 ** @ARGUMENTS:	vector of tuples and the VBN number (-1, if it needs to create a new **		register)
 */
-int newTuple(struct t2fs_4tupla vector, int newVBN);
+int newTuple(struct t2fs_4tupla vector, DWORD newVBN);
 
 /* Gives initial sector of a given MFT register
 ** Main author: NATÁLIA GUBIANI RAMPON - 00262502

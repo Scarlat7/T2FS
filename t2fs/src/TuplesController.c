@@ -9,35 +9,22 @@
 
 t_control ctrl;
 
-int searchMFT(int numReg, struct t2fs_4tupla *vector) {
-	unsigned char buffer1[256], buffer2[256];
-	int i = 0, index = 0;
-	if(read_sector(ctrl.boot.blockSize + 2*numReg, buffer1)) return -1;
-	if(read_sector(ctrl.boot.blockSize + 2*numReg + 1, buffer2)) return -1;
-	for(i=0; i<16; i++) {
-		memcpy(&vector[i].atributeType, buffer1 + index, sizeof(DWORD));
-		index += sizeof(DWORD);
-		memcpy(&vector[i].virtualBlockNumber, buffer1 + index, sizeof(DWORD));
-		index += sizeof(DWORD);
-		memcpy(&vector[i].logicalBlockNumber, buffer1 + index, sizeof(DWORD));
-		index += sizeof(DWORD);
-		memcpy(&vector[i].numberOfContiguosBlocks, buffer1 + index, sizeof(DWORD));
-		index += sizeof(DWORD);
-	}
-	printf("Validade: %d\nVBN: %d\tLBN: %d\nNumCB: %d\n", vector[0].atributeType, vector[0].virtualBlockNumber, vector[0].logicalBlockNumber, vector[0].numberOfContiguosBlocks);
-	index = 0;
-	for(i=16; i<32; i++) {
-		memcpy(&vector[i].atributeType, buffer2 + index, sizeof(DWORD));
-		index += sizeof(DWORD);
-		memcpy(&vector[i].virtualBlockNumber, buffer2 + index, sizeof(DWORD));
-		index += sizeof(DWORD);
-		memcpy(&vector[i].logicalBlockNumber, buffer2 + index, sizeof(DWORD));
-		index += sizeof(DWORD);
-		memcpy(&vector[i].numberOfContiguosBlocks, buffer2 + index, sizeof(DWORD));
-	}
+int mapLBN(DWORD LBN, DWORD* sector){
+	DWORD base;
+	base = 1 + ctrl.boot.MFTBlocksSize*ctrl.boot.blockSize;
+	*sector = base + LBN * ctrl.boot.blockSize;
+	if(*sector > ctrl.boot.diskSectorSize) return -1;
 	return 0;
 }
 
+int searchMFT(DWORD numReg, struct t2fs_4tupla *vector) {
+	if(read_sector(ctrl.boot.blockSize + 2*numReg, (unsigned char*)vector)) return -1;
+	if(read_sector(ctrl.boot.blockSize + 2*numReg + 1, (unsigned char*)vector + SECTOR_SIZE)) return -1;
+	
+	return 0;
+}
+
+/*
 int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
 	
 	DWORD sector;
@@ -51,7 +38,7 @@ int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
 	
 	j = 0;
 	do{
-		if(read_sector(egisterToSector(currentMFT)+j, bufferT) != 0){
+		if(read_sector(registerToSector(currentMFT)+j, bufferT) != 0){
 			fprintf(stderr, "Erro ao ler registro MFT do arquivo.\n");
 			return -1;
 		}
@@ -123,4 +110,4 @@ int registerToSector(DWORD MFT){
 
 int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 	return -1;
-}
+}*/

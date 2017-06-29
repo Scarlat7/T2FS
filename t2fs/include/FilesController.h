@@ -16,5 +16,13 @@ int isValidName(char *name);
 /*Alloc one block to an file*/
 int allocateBlock(struct t2fs_4tupla *vector);
 
+DWORD hasFile(char *directories, DWORD currentReg);
+
+DWORD pathExists(char *pathName);
+
+int LBNToRecord(DWORD LBN, struct t2fs_record* records);
+
+DWORD searchFile(struct t2fs_record *records, char *name);
+
 /*Prints the contents of sector */
 //void printDirectory(unsigned int sector);
