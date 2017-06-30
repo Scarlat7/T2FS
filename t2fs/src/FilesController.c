@@ -103,14 +103,14 @@ int allocateBlock(struct t2fs_4tupla *vector){
 }
 */
 
-void printRecords(DWORD reg) {
+void printRecords(DWORD reg){
 	int i, j, k;
-	struct t2fs_4tupla* tuplas;
-	struct t2fs_record* records;
+	struct t2fs_4tupla tuplas[32];
+	struct t2fs_record records[ctrl.boot.blockSize*4];
 
 	do {
 		i = 0;
-		searchMFT(reg, tuplas); //Dá uma falha de segmentação bizarra aqui
+		searchMFT(reg, tuplas); 
 		do {
 			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
 					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) break;
@@ -131,15 +131,15 @@ DWORD searchFile(struct t2fs_record *records, char *name) {
 	return -1;
 }
 
-//Compila, mas não testei
+//Dá seg fault quando testada separada, mas funciona quando chamada
 int LBNToRecord(DWORD LBN, struct t2fs_record* records){
 	int i;
 	DWORD index=0;
 	DWORD sector;
-	//Pega o primeiro setor do LB	
+	//Pega o primeiro setor do LB
 	if(mapLBN(LBN, &sector) < 0) return -1;
 	for(i = 0; i < ctrl.boot.blockSize; i++){
-		if(read_sector(sector + i, (unsigned char*)(records + index))) return -1;
+		if(read_sector(sector + i, (unsigned char*)records + index)) return -1;
 		index += 4 * sizeof(struct t2fs_record);
 	}
 	return 0;
@@ -147,8 +147,8 @@ int LBNToRecord(DWORD LBN, struct t2fs_record* records){
 
 //Compila, mas não testei
 DWORD hasFile(char *directories, DWORD currentReg) {
-	struct t2fs_4tupla *tuplas;
-	struct t2fs_record *records;
+	struct t2fs_4tupla tuplas[32];
+	struct t2fs_record records[ctrl.boot.blockSize*4];
 	int i, j;
 	DWORD reg;
 
