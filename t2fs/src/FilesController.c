@@ -8,6 +8,46 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/******************************************
+	COMENTEI PRA NÃO ZOAR A COMPILAÇÃO
+void init_openFilesArray(){
+	int i = 0;
+	for(i = 0; i < N_OPENFILES; i++){
+		openFilesArray[i] = -1;
+	}
+}
+
+int getFileNumber(){
+	int i;	
+	for(i = 0; i < N_OPENFILES; i++){
+		if(openFilesArray[i] == -1){
+			return i;		
+		}
+	}
+	printf("NUMERO DE ARQUIVOS ABERTOS EXCEDIDO\n"); 	
+	return -1;
+}
+
+
+int openFile(char *path){
+	if(isOpen(path)) return ERROR;
+		
+	OPENFILES newFile;
+	int fileNumber;
+
+	newFile.MFT = searchFile(path);
+	newFile.currentPointer = 0;
+	strcpy(newFile.name, path);	
+
+	if((fileNumber = getFileNumber())){
+		openFilesArray[fileNumber] = newFile;
+		return fileNumber;
+	}
+
+	else return ERROR;
+}
+*****************************************************/
+
 int isValidName(char *name){
     char current;
     int i = 0;

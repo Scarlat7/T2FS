@@ -10,6 +10,28 @@
 #include <stdio.h>
 #include "t2fs.h"
 
+
+#define N_OPENFILES 20
+
+typedef struct openFiles{
+	DWORD MFT;
+	DWORD currentPointer;
+	char name[MAX_NAME];
+	char sectorBuffer[SECTOR_SIZE];
+
+}OPENFILES;
+
+OPENFILES openFilesArray[N_OPENFILES];
+
+/*inicializa o openFilesArray com -1*/
+void init_openFilesArray();
+
+/*verifica no array de arquivos aberto se há um handle disponível*/
+int getFileNumber()
+
+/*abre um arquivo e retorna o handle*/
+int openFile(char *path);
+
 /* Verifies if the name passed as parameter is valid */
 int isValidName(char *name);
 
