@@ -5,6 +5,8 @@
 
 int main(){
 	if(init_lib()) return 1;
-	printRecords(2);
+	printf("Imprimindo root.\n");
+	printRecords(1);
+	printf("Fim da impressão.\n");
 	return 0;
 }
