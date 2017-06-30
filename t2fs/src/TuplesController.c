@@ -170,7 +170,7 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 				if (i == 31){
 					//Esse é a última tupla disponível nesse registro
 					bufferT[i].atributeType = MFT_ADICIONAL;
-					//newMFT = lookUpMFT();
+					newMFT = findMFT();
 					if(newMFT <= 0){
 						fprintf(stderr,"Disco cheio, impossivel escrever dados.\n");
 						return -1;
@@ -226,5 +226,25 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 		read_sector(registerToSector(currentMFT)+j, (BYTE*) bufferT);
 	}while(1);
 
+	return 0;
+}
+
+DWORD findMFT(){
+
+	int i;
+	struct t2fs_4tupla buffer[SECTOR_SIZE];	
+
+	//Loop starts at 3 because MFT register 0 to 3 are reserved to the file system
+	for(i = 3; i < ctrl.boot.MFTBlocksSize; i++){
+		
+		if(read_sector(registerToSector(i), (BYTE*)buffer) != 0){
+			fprintf(stderr, "Failed to read MFT register %d in sector %d.\n", i, registerToSector(i));
+			return -1;
+		}
+		
+		if(buffer[0].atributeType == INVALID_PTR) return i;
+	}
+
+	fprintf(stderr, "Disk is full, impossible to find a MFT register.\n");
 	return 0;
 }

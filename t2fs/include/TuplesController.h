@@ -60,14 +60,6 @@ int searchMFT(DWORD numReg, struct t2fs_4tupla* vector);
 */
 int mapLBN(DWORD LBN, DWORD* sector);
 
-/* Adds a new tuple to the vector passed as parameter
-** Main author: 
-** @RETURN:	0, if executed without errors
-** 		-1, in case of any error
-** @ARGUMENTS:	vector of tuples and the VBN number (-1, if it needs to create a new **		register)
-*/
-int newTuple(struct t2fs_4tupla vector, DWORD newVBN);
-
 /* Gives initial sector of a given MFT register
 ** Main author: NATÁLIA GUBIANI RAMPON - 00262502
 ** @RETURN: [INT] Initial sector (to be used in read_sector() function )
@@ -75,4 +67,11 @@ int newTuple(struct t2fs_4tupla vector, DWORD newVBN);
 */
 int registerToSector(DWORD MFT);
 
-
+/* Finds first available MFT register
+** Main author: NATÁLIA GUBIANI RAMPON - 00262502
+** @RETURN: [DWORD] MFT register number > 0 if executed without errors
+**		    0 if no MFT is available (full disk)
+**		    -1 if error occurred
+** @ARGUMENTS: none 
+*/
+DWORD findMFT();
