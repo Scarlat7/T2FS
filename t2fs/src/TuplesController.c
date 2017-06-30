@@ -121,8 +121,7 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 	read_sector(registerToSector(currentMFT)+j,(BYTE*) bufferT);
 
 #ifdef DEBUG
-	printf("Tupla 0: Type: %d VBN: %u LBN %u Cont: %d\n", bufferT[0].atributeType, bufferT[0].virtualBlockNumber, 
-			bufferT[0].logicalBlockNumber, bufferT[0].numberOfContiguosBlocks);
+	printf("Buffer size in tuples: %d\n", SECTOR_SIZE/sizeof(struct t2fs_4tupla));
 #endif
 	
 	if(bufferT[0].atributeType == INVALID_PTR && VBN != 0){
@@ -145,16 +144,29 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 		bufferT[0].numberOfContiguosBlocks = 1;
 		bufferT[1].atributeType = FIM_ENCADEAMENTO;
 		write_sector(registerToSector(currentMFT), (BYTE*) bufferT);
+#ifdef DEBUG
+	printf("PRIMEIRA TUPLA do registro %d.\n", currentMFT);
+	printf("\tTupla 0: type: %d VBN: %u LBN: %u contiguous: %d\n",bufferT[0].atributeType,bufferT[0].virtualBlockNumber,
+			bufferT[0].logicalBlockNumber,bufferT[0].numberOfContiguosBlocks);
+	printf("\tTupla 1: type: %d\n", bufferT[1].atributeType); 
+#endif
 		return 0;		
 	}
 
 	do{
 		i = 0;
 		while(i < SECTOR_SIZE/sizeof(struct t2fs_4tupla) && bufferT[i].atributeType != FIM_ENCADEAMENTO){
-			//se o VBN procuraod está mapeado nessa tupla
+			//se o VBN procurado está mapeado nessa tupla
 			if(bufferT[i].atributeType == MAPEAMENTO){
+#ifdef DEBUG
+				printf("Verificar se VBN esta no RANGE da tupla.\n");
+				printf("\ttupla: VBN %u cont: %d range: %d\n", bufferT[i].virtualBlockNumber, bufferT[i].numberOfContiguosBlocks,
+					bufferT[i].virtualBlockNumber + bufferT[i].numberOfContiguosBlocks-1);
+				printf("\tVBN procurada %u\n",VBN);
+#endif
 				if((bufferT[i].virtualBlockNumber + bufferT[i].numberOfContiguosBlocks-1) >= VBN && bufferT[i].virtualBlockNumber >= VBN){
 					*LBN = (VBN  - bufferT[i].virtualBlockNumber) + bufferT[i].logicalBlockNumber;
+					return 0;
 				}
 				else	i++;	
 			}
@@ -200,16 +212,28 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 						//o bloco é contiguo ao ultimo da tupla
 						bufferT[i-1].numberOfContiguosBlocks++;	
 						write_sector(registerToSector(currentMFT), (BYTE*) bufferT);
+#ifdef DEBUG
+						printf("MAPEAMENTO CONTIGUO:\n"); 
+						printf("\tTupla num %d modificada do registro %d\n", i-1, currentMFT);
+						printf("\ttupla: type %d VBN %u LBN %u cont %d\n", bufferT[i-1].atributeType,bufferT[i-1].virtualBlockNumber, 
+							bufferT[i-1].logicalBlockNumber, bufferT[i-1].numberOfContiguosBlocks);
+#endif
 						return 0;
 					}
 					else{
 						//precisa de uma nova tupla
 						bufferT[i].atributeType = MAPEAMENTO;
 						bufferT[i+1].atributeType = FIM_ENCADEAMENTO;
-						bufferT[i].virtualBlockNumber = bit - bufferT[i-1].logicalBlockNumber;
+						bufferT[i].virtualBlockNumber = VBN; 
 						bufferT[i].logicalBlockNumber = bit;
 						bufferT[i].numberOfContiguosBlocks = 1;
 						write_sector(registerToSector(currentMFT), (BYTE*) bufferT);
+#ifdef DEBUG
+						printf("MAPEAMENTO NOVA TUPLA:\n"); 
+						printf("\tTupla num %d (anterior):type %d VBN %u LBN %u cont %d\n", i, bufferT[i].atributeType,
+							bufferT[i].virtualBlockNumber, bufferT[i].logicalBlockNumber, bufferT[i].numberOfContiguosBlocks);
+						printf("\tTupla num %d (proxima):type %d\n", i+1, bufferT[i+1].atributeType);
+#endif					
 						return 0;
 					}
 				}
