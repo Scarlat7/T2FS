@@ -28,3 +28,4 @@ int read2 (FILE2 handle, char *buffer, int size){
 	else return ERROR;	
 }
 *********************************************/
+

@@ -30,14 +30,18 @@ int getFileNumber(){
 
 
 int openFile(char *path){
+	struct t2fs_records fileRecord;
 	if(isOpen(path)) return ERROR;
 		
 	OPENFILES newFile;
 	int fileNumber;
 
-	newFile.MFT = searchFile(path);
+	fileRecord = getRecordsFile(path);
+
+	newFile.MFT = fileRecord.MFTNumber;
 	newFile.currentPointer = 0;
-	strcpy(newFile.name, path);	
+	strcpy(fileRecord.name, path);	
+	newFile.size = fileRecord.bytesFileSize;
 
 	if((fileNumber = getFileNumber())){
 		openFilesArray[fileNumber] = newFile;
@@ -46,8 +50,66 @@ int openFile(char *path){
 
 	else return ERROR;
 }
-*****************************************************/
 
+struct t2fs_records getRecordsFile(char *path){
+	char *directorie;
+	struct t2fs_records actualRecord;
+	BYTE sectors = malloc(sectorsInBlock*SECTOR_SIZE);
+	int i, j;
+	DWORD rootBlocks = getRootBlocks();
+	DWORD currentLB;
+	
+	directorie = strtok(path, "/");	
+
+	for(i = 0; i < rootBlocks; i++){
+		currentLB = mapVBN(1, i);
+		initial_sector = blockToSector(currentLB);
+		for(j = 0; j < sectorsInBlock; j++){		
+			read_sector(initial_sector+j, sectors);
+			sectors+=SECTOR_SIZE;
+		}
+		
+		if(actualRecord = getRecordByName(directorie, sectors))
+			break;
+	}
+
+	if(actualRecord.TypeVal == 1)
+		return actualRecord;
+	 
+	while((directorie = strtok(NULL, "/")){
+		for(i = 0; i < actualRecord.blocksFileSize; i++){
+			currentLB = mapVBN(actualRecord.MFTNumber,i);
+			initial_sector = blockToSector(currentLB);
+			for(j = 0; j < sectorsInBlock; j++){
+				read_sector(initial_sector+j, sectors);
+				sectors+=SECTOR_SIZE;
+			}
+			if(actualRecord = getRecordByName(directorie, sectors))
+				break;
+		}
+
+		if(actualRecord.TypeVal == 1)
+			return actualRecord;
+	}
+
+	return ERROR;
+}
+
+struct t2fs_records getRecordByName(char *name, BYTE *sectors){
+	int RECORD_SIZE = sizeof(struct t2fs_records);	
+	int N_RECORDS = SECTOR_SIZE/RECORD_SIZE;
+	struct t2fs_records actual_record;
+	int i;
+	for(i = 0; i < N_RECORDS; i++){
+		memcpy(&actual_record, sectors+RECORD_SIZE*i, RECORD_SIZE)
+		if(strcmp(actual_record.name, name) == 0)
+			return actual_record; 
+	}
+
+	return NULL;
+}
+
+*****************************************************/
 int isValidName(char *name){
     char current;
     int i = 0;

@@ -16,6 +16,7 @@
 typedef struct openFiles{
 	DWORD MFT;
 	DWORD currentPointer;
+	DWORD size;
 	char name[MAX_NAME];
 	char sectorBuffer[SECTOR_SIZE];
 
