@@ -101,18 +101,19 @@ int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
 	}while(remaining != nSectors);
 
 	return 0;
-}
-
+}*/
+ 
 int registerToSector(DWORD MFT){
 
-	if(MFT > MFTBlocksSize || MFT < 0){
-		fprintf(stderr, "Registro MFT requisitado fora dos limites.\n");i
+	if(MFT > ctrl.boot.MFTBlocksSize || MFT < 0){
+		fprintf(stderr, "Registro MFT requisitado fora dos limites.\n");
 		return -1;
 	}
 
-	return (MFT + 1)*blockSize;
+	return (MFT + 1)*ctrl.boot.blockSize;
 }
 
+/*
 int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 	
 	t2fs_4tupla bufferT[SECTOR_SIZE/sizeof(t2fs_4tupla)], bufferNew[SECTOR_SIZE/sizeof(t2fs_4tupla)];
