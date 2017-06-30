@@ -234,8 +234,8 @@ DWORD findMFT(){
 	int i;
 	struct t2fs_4tupla buffer[SECTOR_SIZE];	
 
-	//Loop starts at 3 because MFT register 0 to 3 are reserved to the file system
-	for(i = 3; i < ctrl.boot.MFTBlocksSize; i++){
+	//Loop starts at 4 because MFT register 0 to 4 are reserved to the file system
+	for(i = 4; i < ctrl.boot.MFTBlocksSize; i++){
 		
 		if(read_sector(registerToSector(i), (BYTE*)buffer) != 0){
 			fprintf(stderr, "Failed to read MFT register %d in sector %d.\n", i, registerToSector(i));
