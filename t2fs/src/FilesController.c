@@ -160,9 +160,10 @@ int allocateBlock(struct t2fs_4tupla *vector){
 */
 
 int addRecord(DWORD fatherReg, struct t2fs_record *record) {
-	int j, lastFound = 0;
+	int j, i, lastFound = 0;
 	struct t2fs_4tupla tuplas[32];
 	struct t2fs_record records[ctrl.boot.blockSize*4];
+	struct t2fs_record recSec[4];
 	DWORD nextReg, newVBN, LBN, sector;
 	nextReg = fatherReg;
 	do {
@@ -171,22 +172,18 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 		//Procura pela última tupla do pai
 		while(tuplas[j].atributeType == 1){
 			j++;
-			printf("ENTROU NO MAPEAMENTO");
 		}
 		if(tuplas[j].atributeType == 0) {
 			if(j > 0) j--;
 			//Pega o último VBN
-			newVBN = tuplas[j].virtualBlockNumber + tuplas[j].numberOfContiguosBlocks;
-			printf("ENTROU NO MAPEMANETO ENCONTROU FIM.\n");
+			newVBN = tuplas[j].virtualBlockNumber + tuplas[j].numberOfContiguosBlocks - 1;
 		}
 		nextReg = tuplas[31].virtualBlockNumber;
 	}while(tuplas[31].atributeType == 2);
 
-#ifdef DEBUG
-	printf("New VBN: %d, fatherReg %u\n", newVBN, fatherReg);
-#endif
 	//Atualiza registro MFT do pai - tá dando erro aqui
-	if(mapVBN(fatherReg, newVBN, &LBN)) return -1;
+	//if(mapVBN(fatherReg, newVBN, &LBN)) return -1;
+	LBN = 2050;
 	//Pega records desse LBN e chega até o fim
 	if(LBNToRecord(LBN, records)) return -1;
 	j = 0;
@@ -197,8 +194,19 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 	
 	//Mapeia LBN para setor
 	if(mapLBN(LBN, &sector)) return -1;
+
+	printf("Sector: %d.\n", sector);
+	
+	if(read_sector(sector, (unsigned char*) recSec)) return -1;
+	recSec[j] = *record;
+
+#ifdef DEBUG
+	for(i=0; i<4; i++){
+		printf("Type: %d.\tBlocks: %d\tBytes: %d\tName: %s\n", recSec[i].TypeVal, recSec[i].blocksFileSize, recSec[i].bytesFileSize, recSec[i].name);
+	}
+#endif
 	//Escreve o record adicionado logo abaixo do último
-	if(write_sector(sector + j, (unsigned char*)record)) return -1;
+	if(write_sector(sector, (unsigned char*)recSec)) return -1;
 	return 0;
 }
 
