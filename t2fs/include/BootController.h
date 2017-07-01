@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include "t2fs.h"
 
+#define ERROR -1
+
 /** Control struct for library data static data */
 typedef struct s_Control {
 	

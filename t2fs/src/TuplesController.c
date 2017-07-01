@@ -121,8 +121,8 @@ lllllllllllllllllllll
 				return -1;
 			}
 		}
-*/
-}
+
+} */
  
 int registerToSector(DWORD MFT){
 
@@ -195,12 +195,12 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 		}		
 	
 		//Achou o lugar onde deve começar a mapeamento do próximo
-		if(i < 32 && bufferT[i].atributeType == FIM_ENCADEAMENTO){
+		if(i < TUPLES_IN_REG && bufferT[i].atributeType == FIM_ENCADEAMENTO){
 			if(isSequential(VBN, bufferT[i-1])){
 				fprintf(stderr,"Mapeamento requer bloco virtual nao contiguou ao ultimo mapeado.\n");
 				return -1;
 			}
-			if (i == 31){
+			if (i == TUPLES_IN_REG-1){
 				//Esse é a última tupla disponível nesse registro
 				bufferT[i].atributeType = MFT_ADICIONAL;
 				newMFT = findMFT();
@@ -228,7 +228,7 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 				printf("MAPEAMENTO NOVO BLOCO\n");
 #endif
 				return 0;
-			}//fim i==31
+			}//fim i==TUPLES_IN_REG-1
 			else{
 				bit = searchBitmap2(0);
 				*LBN = bit;
@@ -348,4 +348,12 @@ int isInRange(DWORD VBN, struct t2fs_4tupla t){
 	if((t.virtualBlockNumber + t.numberOfContiguosBlocks-1) >= VBN && t.virtualBlockNumber >= VBN){
 		return 1;
 	} else return 0;
+}
+
+int writeRegister(DWORD MFT, struct t2fs_4tupla* bufferT){
+
+	if(write_sector(registerToSector(MFT), (BYTE*) bufferT) != 0) return ERROR;
+	if(write_sector(registerToSector(MFT)+1, (BYTE*) bufferT+SECTOR_SIZE) != 0) return ERROR;
+
+	return 0;
 }

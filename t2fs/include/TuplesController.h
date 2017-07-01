@@ -121,3 +121,12 @@ int getFileBlockSize(DWORD MFT);
 **	       [T2FS_4TUPLA - IN] tuple in which the VBN possibly is mapped
 */
 int isInRange(DWORD VBN, struct t2fs_4tupla t);
+
+/* Writes a MFT register
+** Main author: NATÁLIA GUBIANI RAMPON - 00262502
+** @RETURN: 0 - if executed withour errors
+**			1 - if an error occurred
+** @ARGUMENTS: [DWORD - IN] MFT register to be written
+**	       [T2FS_4TUPLA* - IN] buffer of size 32 to be written
+*/
+int writeRegister(DWORD MFT, struct t2fs_4tupla* bufferT);
