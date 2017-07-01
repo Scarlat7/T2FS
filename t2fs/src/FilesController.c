@@ -177,13 +177,12 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 			if(j > 0) j--;
 			//Pega o último VBN
 			newVBN = tuplas[j].virtualBlockNumber + tuplas[j].numberOfContiguosBlocks - 1;
+			
 		}
 		nextReg = tuplas[31].virtualBlockNumber;
 	}while(tuplas[31].atributeType == 2);
-
-	//Atualiza registro MFT do pai - tá dando erro aqui
-	//if(mapVBN(fatherReg, newVBN, &LBN)) return -1;
-	LBN = 2050;
+	//Atualiza registro MFT do pai
+	if(mapVBN(fatherReg, newVBN, &LBN)) return -1;
 	//Pega records desse LBN e chega até o fim
 	if(LBNToRecord(LBN, records)) return -1;
 	j = 0;
@@ -194,8 +193,6 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 	
 	//Mapeia LBN para setor
 	if(mapLBN(LBN, &sector)) return -1;
-
-	printf("Sector: %d.\n", sector);
 	
 	if(read_sector(sector, (unsigned char*) recSec)) return -1;
 	recSec[j] = *record;
@@ -221,7 +218,7 @@ void printRecords(DWORD reg){
 		do {
 			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
 					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) break;
-					for(k=0; k < ctrl.boot.blockSize; k++) printf("Name: %s\tType: %d\nBlocks: %d\tBytes: %d\n", records[k].name, records[k].TypeVal, records[k].blocksFileSize, records[k].bytesFileSize);
+					for(k=0; k < ctrl.boot.blockSize; k++) printf("Name: %s\tType: %d\tBlocks: %d\tBytes: %d\n", records[k].name, records[k].TypeVal, records[k].blocksFileSize, records[k].bytesFileSize);
 			}
 			i++;
 		}while(tuplas[i].atributeType == 1);
@@ -233,7 +230,7 @@ void printRecords(DWORD reg){
 DWORD searchFile(struct t2fs_record *records, char *name) {
 	int i;
 	for(i=0; i< 4*ctrl.boot.blockSize; i++){
-		if(strcmp(records[i].name, name)) return records[i].MFTNumber;
+		if(strcmp(records[i].name, name) == 0) return records[i].MFTNumber;
 	}
 	return -1;
 }
@@ -279,7 +276,9 @@ DWORD hasFile(char *directories, DWORD currentReg) {
 
 //Funcionando
 DWORD pathExists(char *pathName, char *fileName) {
-	char *directories = strtok(pathName, "/");
+	char path[strlen(pathName)+1];
+	strcpy(path, pathName);
+	char *directories = strtok(path, "/");
 	DWORD reg = 1, i;
 	while(directories && strcmp(directories, fileName)){
 		i = hasFile(directories, reg);

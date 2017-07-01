@@ -40,8 +40,7 @@ int mkdir2 (char *pathname){
 	
 	//Procura pelo pai
 	fatherReg = pathExists(pathname, dirName);
-
-	if(fatherReg) {
+	if(fatherReg > 0) {
 		newReg = findMFT();
 		if(newReg <= 0) return -1;
 		//Atualiza registro MFT recém criado
