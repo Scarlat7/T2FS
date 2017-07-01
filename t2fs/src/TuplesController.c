@@ -28,31 +28,59 @@ int searchMFT(DWORD numReg, struct t2fs_4tupla *vector) {
 /*
 int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
 	
-	DWORD sector;
+	DWORD sector, currentMFT;
 	DWORD startVirtualBlock, block;
-	int i, j, k;
+	int k, offset;
 	int remaining = 0;
+	int index = 0;
 	BYTE bufferS[SECTOR_SIZE];
-	t2fs_4tupla bufferT[SECTOR_SIZE/sizeof(t2fs_4tupla)];
+	t2fs_4tupla bufferT[TUPLES_IN_REG];
+	DWORD LBN;
 
-	int currentMFT = ctrl.OpenFilesArray[fileHandle].MFT;
+	currentMFT = ctrl.OpenFilesArray[fileHandle].MFT;
+
+	searchMFT(curentMFT, bufferT);
 	
-	j = 0;
-	do{
-		if(read_sector(registerToSector(currentMFT)+j, bufferT) != 0){
-			fprintf(stderr, "Erro ao ler registro MFT do arquivo.\n");
-			return -1;
+	startVirtualBlock = ctrl.OpenFilesArray[fileHandle].currentPointer/ctrl.boot.blockSize;	
+	
+	offset = (ctrl.OpenFilesArray[fileHandle].currentPointer%ctrl.boot.blockSize)/SECTOR_SIZE;	
+	
+	if(ctrl.OpenFilesArray[fileHandle].size/SECTOR_SIZE+1 < offset + nSectors){
+		fprintf(stderr,"Numero de setores requisitados eh maior do que o arquivo.\n");
+		return ERROR;
+	}
+
+	k = 0;
+
+	while(remaining != nSectors){
+
+		if(mapVBN(currentMFT, startVirtualBlock+k, &LBN) != 0){
+			return ERROR;
+		}			
+	
+		mapLBN(LBN, &sector);
+				
+		//percorre até o fim desse bloco
+		while(sector%ctrl.boot.blockSize != 0 && remaining != nSector){	
+			//primeiro bloco pode ter apenas uma parte
+			if(!remaining){
+				sector +=  offset;
+			}else sector++;
+			if(read_sector(sector, buffer+index) != 0)
+				return ERROR;
+			remaining++;
+			index+=SECTOR_SIZE;
 		}
-	
-		startVirtualBlock = ctrl.OpenFilesArray[fileHandle].currentPointer/ctrl.blockSize;	
-		
-		i = 0;
-		
+		k++;
+	}
+
+	return 0;
+
+lllllllllllllllllllll
 		//loop de leitura do buffer de tuplas de um setor
-		while(i < SECTOR_SIZE/sizeof(t2fs_4tupla) && remaining != nSectors){
+		while(i < TUPLES_IN_REG && remaining != nSectors){
 			if(bufferT[i].atributeType == MAPEAMENTO){
-				if((bufferT[i].virtualBlockNumber + bufferT[i].numberOfContiguousBlocks-1) >=  startVirtual && bufferT[i].virtualBlockNumber >= startVirtual){
-					//for(k = 0; k < nSectors; k++){
+				if(isInRange(startVirtualBlock, bufferT[i])){
 					k = startVirtualBlock - bufferT[i].virtualBlockNumber;
 					while(remaining != nSectors && k < numberOfContiguousBlocks){
 						block = bufferT[i].logicalBlockNumber + k;
@@ -93,27 +121,24 @@ int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
 				return -1;
 			}
 		}
-		 
-	}while(remaining != nSectors);
-
-	return 0;
-}*/
+*/
+}
  
 int registerToSector(DWORD MFT){
 
-	if(MFT > ((ctrl.boot.MFTBlocksSize*ctrl.boot.blockSize)/2 - 1) || MFT < 0){
+	if(MFT > ((ctrl.boot.MFTBlocksSize*ctrl.boot.blockSize)/SECTORS_IN_REG - 1) || MFT < 0){
 		fprintf(stderr, "Registro MFT requisitado fora dos limites.\n");
 		return -1;
 	}
 
-	return ctrl.boot.blockSize + MFT*2;
+	return ctrl.boot.blockSize + MFT*SECTORS_IN_REG;
 
 }
 
 
 int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 	
-	struct t2fs_4tupla bufferT[32], bufferNew[SECTOR_SIZE/sizeof(struct t2fs_4tupla)];
+	struct t2fs_4tupla bufferT[TUPLES_IN_REG], bufferNew[TUPLES_IN_REG/2];
 
 	int i;
 	DWORD currentMFT = MFT, newMFT;
@@ -152,7 +177,7 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 
 	do{
 		i = 0;
-		while(i < 32  && bufferT[i].atributeType != FIM_ENCADEAMENTO){
+		while(i < TUPLES_IN_REG  && bufferT[i].atributeType != FIM_ENCADEAMENTO){
 			//se o VBN procurado está mapeado nessa tupla
 			if(bufferT[i].atributeType == MAPEAMENTO){
 #ifdef DEBUG
@@ -161,7 +186,7 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 				//	bufferT[i].virtualBlockNumber + bufferT[i].numberOfContiguosBlocks-1);
 				//printf("\tVBN procurada %u\n",VBN);
 #endif
-				if((bufferT[i].virtualBlockNumber + bufferT[i].numberOfContiguosBlocks-1) >= VBN && bufferT[i].virtualBlockNumber >= VBN){
+				if(isInRange(VBN, bufferT[i])){
 					*LBN = (VBN  - bufferT[i].virtualBlockNumber) + bufferT[i].logicalBlockNumber;
 					return 0;
 				}
@@ -276,12 +301,12 @@ int getFileBlockSize(DWORD MFT){
 
 	int i, counter = 0;
 	DWORD currentMFT = MFT;
-	struct t2fs_4tupla buffer[32];
+	struct t2fs_4tupla buffer[TUPLES_IN_REG];
 
 	do{
 		searchMFT(currentMFT,buffer);
 		i = 0;
-		while(i < 32){
+		while(i < TUPLES_IN_REG){
 	
 			if(buffer[i].atributeType == MAPEAMENTO){
 				counter+=buffer[i].numberOfContiguosBlocks;
@@ -316,4 +341,11 @@ int isSequential(DWORD VBN, struct t2fs_4tupla t){
 		return 1;
 	}else return 0;
 
+}
+
+int isInRange(DWORD VBN, struct t2fs_4tupla t){
+
+	if((t.virtualBlockNumber + t.numberOfContiguosBlocks-1) >= VBN && t.virtualBlockNumber >= VBN){
+		return 1;
+	} else return 0;
 }

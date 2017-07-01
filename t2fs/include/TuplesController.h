@@ -14,6 +14,9 @@
 #define MAPEAMENTO 1
 #define MFT_ADICIONAL 2
 
+#define TUPLES_IN_REG 32
+#define SECTORS_IN_REG 2
+
 /* Maps the program Virtual Block Number (VBN) to a disk Logical Block Number
 ** (LBN)
 ** Main author: NATÁLIA GUBIANI RAMPON - 00262502
@@ -108,3 +111,13 @@ int isSequential(DWORD VBN, struct t2fs_4tupla t);
 ** @ARGUMENTS: [DWORD - IN] MFT register of the file
 */
 int getFileBlockSize(DWORD MFT);
+
+/* Boolean function to determine if a VBN is in the range of blocks
+** mapped in a tuple
+** Main author: NATÁLIA GUBIANI RAMPON - 00262502
+** @RETURN: [INT] 1 - if it's in range
+**		  0 - if it isn't in range
+** @ARGUMENTS: [DWORD - IN] requested VBN
+**	       [T2FS_4TUPLA - IN] tuple in which the VBN possibly is mapped
+*/
+int isInRange(DWORD VBN, struct t2fs_4tupla t);
