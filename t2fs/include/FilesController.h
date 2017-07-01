@@ -16,12 +16,15 @@
 typedef struct openFiles{
 	DWORD MFT;
 	DWORD currentPointer;
+	DWORD size;
 	char name[MAX_FILE_NAME_SIZE];
 	char sectorBuffer[SECTOR_SIZE];
 
 }OPENFILES;
 
 OPENFILES openFilesArray[N_OPENFILES];
+
+
 
 /*inicializa o openFilesArray com -1*/
 //void init_openFilesArray();
@@ -31,6 +34,12 @@ OPENFILES openFilesArray[N_OPENFILES];
 
 /*abre um arquivo e retorna o handle*/
 //int openFile(char *path);
+
+/*retorna um record do file especificado*/
+//struct t2fs_records getRecordsFile(char *path);
+
+/*procura numa região de memória o record com o nome especificado e o retorna*/
+//struct t2fs_records getRecordByName(char *name, BYTE *sectors);
 
 /* Verifies if the passed parameter is valid
 ** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
