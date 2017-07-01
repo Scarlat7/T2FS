@@ -1,4 +1,4 @@
-#include "FilesController.h"
+﻿#include "FilesController.h"
 #include "TuplesController.h"
 #include "BootController.h"
 #include "t2fs.h"
@@ -92,6 +92,9 @@ int mkdir2 (char *pathname){
 	
 	//Procura pelo pai
 	fatherReg = pathExists(pathname, dirName);
+
+	//Verifica se já há uma pasta com esse nome
+	if(hasFile(dirName, fatherReg) != -1) return -1;
 	if(fatherReg > 0) {
 		newReg = findMFT();
 		if(newReg <= 0) return -1;
