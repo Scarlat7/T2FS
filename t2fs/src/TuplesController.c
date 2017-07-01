@@ -113,17 +113,13 @@ int registerToSector(DWORD MFT){
 
 int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 	
-	struct t2fs_4tupla bufferT[SECTOR_SIZE/sizeof(struct t2fs_4tupla)], bufferNew[SECTOR_SIZE/sizeof(struct t2fs_4tupla)];
+	struct t2fs_4tupla bufferT[32], bufferNew[SECTOR_SIZE/sizeof(struct t2fs_4tupla)];
 
-	int i, j = 0;
+	int i;
 	DWORD currentMFT = MFT, newMFT;
 	int bit;	
 
-	read_sector(registerToSector(currentMFT)+j,(BYTE*) bufferT);
-
-#ifdef DEBUG
-	printf("Buffer size in tuples: %d\n", SECTOR_SIZE/sizeof(struct t2fs_4tupla));
-#endif
+	searchMFT(MFT, bufferT);
 	
 	if(bufferT[0].atributeType == INVALID_PTR && VBN != 0){
 		fprintf(stderr,"MFT invalido para mapeamento.\n");
@@ -146,109 +142,111 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 		bufferT[1].atributeType = FIM_ENCADEAMENTO;
 		write_sector(registerToSector(currentMFT), (BYTE*) bufferT);
 #ifdef DEBUG
-	printf("PRIMEIRA TUPLA do registro %d.\n", currentMFT);
-	printf("\tTupla 0: type: %d VBN: %u LBN: %u contiguous: %d\n",bufferT[0].atributeType,bufferT[0].virtualBlockNumber,
+		printf("PRIMEIRA TUPLA do registro %d.\n", currentMFT);
+		printf("\tTupla 0: type: %d VBN: %u LBN: %u contiguous: %d\n",bufferT[0].atributeType,bufferT[0].virtualBlockNumber,
 			bufferT[0].logicalBlockNumber,bufferT[0].numberOfContiguosBlocks);
-	printf("\tTupla 1: type: %d\n", bufferT[1].atributeType); 
+		printf("\tTupla 1: type: %d\n", bufferT[1].atributeType); 
 #endif
 		return 0;		
 	}
 
 	do{
 		i = 0;
-		while(i < SECTOR_SIZE/sizeof(struct t2fs_4tupla) && bufferT[i].atributeType != FIM_ENCADEAMENTO){
+		while(i < 32  && bufferT[i].atributeType != FIM_ENCADEAMENTO){
 			//se o VBN procurado está mapeado nessa tupla
 			if(bufferT[i].atributeType == MAPEAMENTO){
 #ifdef DEBUG
-				printf("Verificar se VBN esta no RANGE da tupla.\n");
-				printf("\ttupla: VBN %u cont: %d range: %d\n", bufferT[i].virtualBlockNumber, bufferT[i].numberOfContiguosBlocks,
-					bufferT[i].virtualBlockNumber + bufferT[i].numberOfContiguosBlocks-1);
-				printf("\tVBN procurada %u\n",VBN);
+				//printf("Verificar se VBN esta no RANGE da tupla.\n");
+				//printf("\ttupla: VBN %u cont: %d range: %d\n", bufferT[i].virtualBlockNumber, bufferT[i].numberOfContiguosBlocks,
+				//	bufferT[i].virtualBlockNumber + bufferT[i].numberOfContiguosBlocks-1);
+				//printf("\tVBN procurada %u\n",VBN);
 #endif
 				if((bufferT[i].virtualBlockNumber + bufferT[i].numberOfContiguosBlocks-1) >= VBN && bufferT[i].virtualBlockNumber >= VBN){
 					*LBN = (VBN  - bufferT[i].virtualBlockNumber) + bufferT[i].logicalBlockNumber;
 					return 0;
 				}
-				else	i++;	
 			}
-		}
-		
+			i++;
+		}		
+	
 		//Achou o lugar onde deve começar a mapeamento do próximo
-		if(bufferT[i].atributeType == FIM_ENCADEAMENTO){
-			if(VBN - (bufferT[i-1].virtualBlockNumber + bufferT[i-1].numberOfContiguosBlocks - 1) != 1){
+		if(i < 32 && bufferT[i].atributeType == FIM_ENCADEAMENTO){
+			if(isSequential(VBN, bufferT[i-1])){
 				fprintf(stderr,"Mapeamento requer bloco virtual nao contiguou ao ultimo mapeado.\n");
 				return -1;
 			}
-			else{
-				if (i == 31){
-					//Esse é a última tupla disponível nesse registro
-					bufferT[i].atributeType = MFT_ADICIONAL;
-					newMFT = findMFT();
-					if(newMFT <= 0){
-						fprintf(stderr,"Disco cheio, impossivel escrever dados.\n");
-						return -1;
-					}
-					bufferT[i].virtualBlockNumber = newMFT;
-							// lookUpMFT vai procurar o próximo MFT válido, se for executada sem erros devolve um MFT >0
-							// se nao possuir mais MFT disponíveis retorna 0
-							// se der erro -1
-					write_sector(registerToSector(currentMFT), (BYTE*) bufferT);
-					read_sector(registerToSector(newMFT), (BYTE*)bufferNew);
-					bufferNew[0].atributeType = MAPEAMENTO;
-					bufferNew[1].atributeType = FIM_ENCADEAMENTO;
-					bufferNew[0].virtualBlockNumber = VBN;
-					bit = searchBitmap2(0);
-					bufferNew[0].logicalBlockNumber = bit;
-					*LBN = bit; 
-					setBitmap2(bit, 1);
-					bufferNew[0].numberOfContiguosBlocks = 1;
-					write_sector(registerToSector(newMFT), (BYTE*) bufferNew);
-					return 0;
-				}//fim i==31
-				else{
-					bit = searchBitmap2(0);
-					*LBN = bit;
-					setBitmap2(bit, 1);
-					if(bufferT[i-1].virtualBlockNumber + bufferT[i-1].numberOfContiguosBlocks + bufferT[i-1].logicalBlockNumber == bit){
-						//o bloco é contiguo ao ultimo da tupla
-						bufferT[i-1].numberOfContiguosBlocks++;	
-						write_sector(registerToSector(currentMFT), (BYTE*) bufferT);
-#ifdef DEBUG
-						printf("MAPEAMENTO CONTIGUO:\n"); 
-						printf("\tTupla num %d modificada do registro %d\n", i-1, currentMFT);
-						printf("\ttupla: type %d VBN %u LBN %u cont %d\n", bufferT[i-1].atributeType,bufferT[i-1].virtualBlockNumber, 
-							bufferT[i-1].logicalBlockNumber, bufferT[i-1].numberOfContiguosBlocks);
-#endif
-						return 0;
-					}
-					else{
-						//precisa de uma nova tupla
-						bufferT[i].atributeType = MAPEAMENTO;
-						bufferT[i+1].atributeType = FIM_ENCADEAMENTO;
-						bufferT[i].virtualBlockNumber = VBN; 
-						bufferT[i].logicalBlockNumber = bit;
-						bufferT[i].numberOfContiguosBlocks = 1;
-						write_sector(registerToSector(currentMFT), (BYTE*) bufferT);
-#ifdef DEBUG
-						printf("MAPEAMENTO NOVA TUPLA:\n"); 
-						printf("\tTupla num %d (anterior):type %d VBN %u LBN %u cont %d\n", i, bufferT[i].atributeType,
-							bufferT[i].virtualBlockNumber, bufferT[i].logicalBlockNumber, bufferT[i].numberOfContiguosBlocks);
-						printf("\tTupla num %d (proxima):type %d\n", i+1, bufferT[i+1].atributeType);
-#endif					
-						return 0;
-					}
+			if (i == 31){
+				//Esse é a última tupla disponível nesse registro
+				bufferT[i].atributeType = MFT_ADICIONAL;
+				newMFT = findMFT();
+				if(newMFT <= 0){
+					fprintf(stderr,"Disco cheio, impossivel escrever dados.\n");
+					return -1;
 				}
+				bufferT[i].virtualBlockNumber = newMFT;
+						// lookUpMFT vai procurar o próximo MFT válido, se for executada sem erros devolve um MFT >0
+						// se nao possuir mais MFT disponíveis retorna 0
+						// se der erro -1
+				write_sector(registerToSector(currentMFT), (BYTE*) bufferT);
+				write_sector(registerToSector(currentMFT)+1,(BYTE*) bufferT+SECTOR_SIZE);
+				read_sector(registerToSector(newMFT), (BYTE*)bufferNew);
+				bufferNew[0].atributeType = MAPEAMENTO;
+				bufferNew[1].atributeType = FIM_ENCADEAMENTO;
+				bufferNew[0].virtualBlockNumber = VBN;
+				bit = searchBitmap2(0);
+				bufferNew[0].logicalBlockNumber = bit;
+				*LBN = bit; 
+				setBitmap2(bit, 1);
+				bufferNew[0].numberOfContiguosBlocks = 1;
+				write_sector(registerToSector(newMFT), (BYTE*) bufferNew);
+#ifdef DEBUG
+				printf("MAPEAMENTO NOVO BLOCO\n");
+#endif
+				return 0;
+			}//fim i==31
+			else{
+				bit = searchBitmap2(0);
+				*LBN = bit;
+				setBitmap2(bit, 1);
+					
+				if(isContiguous(bit, bufferT[i-1])){
+					bufferT[i-1].numberOfContiguosBlocks++;	
+					write_sector(registerToSector(currentMFT), (BYTE*) bufferT);
+					write_sector(registerToSector(currentMFT)+1, (BYTE*) bufferT+SECTOR_SIZE);
+#ifdef DEBUG
+					printf("MAPEAMENTO CONTIGUO:\n"); 
+					printf("\tTupla num %d modificada do registro %d\n", i-1, currentMFT);
+					printf("\ttupla: type %d VBN %u LBN %u cont %d\n", bufferT[i-1].atributeType,bufferT[i-1].virtualBlockNumber, 
+						bufferT[i-1].logicalBlockNumber, bufferT[i-1].numberOfContiguosBlocks);
+#endif
+					return 0;
+				}
+				//precisa de uma nova tupla
+				bufferT[i].atributeType = MAPEAMENTO;
+				bufferT[i].virtualBlockNumber = VBN; 
+				bufferT[i].logicalBlockNumber = bit;
+				bufferT[i].numberOfContiguosBlocks = 1;
+	
+				bufferT[i+1].atributeType = FIM_ENCADEAMENTO;
+				write_sector(registerToSector(currentMFT), (BYTE*) bufferT);
+				write_sector(registerToSector(currentMFT)+1,(BYTE*) bufferT+SECTOR_SIZE);
+#ifdef DEBUG
+				printf("MAPEAMENTO NOVA TUPLA:\n"); 
+				printf("\tTupla num %d (anterior):type %d VBN %u LBN %u cont %d\n", i, bufferT[i].atributeType,
+					bufferT[i].virtualBlockNumber, bufferT[i].logicalBlockNumber, bufferT[i].numberOfContiguosBlocks);
+				printf("\tTupla num %d (proxima):type %d\n", i+1, bufferT[i+1].atributeType);
+#endif					
+				return 0;	
 			}
 		}
-
+	
 		if(bufferT[i-1].atributeType == MFT_ADICIONAL){
 			currentMFT = bufferT[i-1].virtualBlockNumber;
-			j = 0;
-		}else{
-			j+=1;
+			searchMFT(currentMFT, bufferT);
+#ifdef DEBUG
+			printf("INDO PARA PROXIMO BLOCO.\n");
+#endif
 		}
-
-		read_sector(registerToSector(currentMFT)+j, (BYTE*) bufferT);
 	}while(1);
 
 	return 0;
@@ -305,4 +303,19 @@ int getFileBlockSize(DWORD MFT){
 	}while(1);
 
 	return -1;
+}
+
+int isContiguous(int bit, struct t2fs_4tupla t){
+
+	if (t.numberOfContiguosBlocks + t.logicalBlockNumber == bit){
+		return 1;
+	}else return 0;
+}
+
+int isSequential(DWORD VBN, struct t2fs_4tupla t){
+
+	if(VBN - (t.virtualBlockNumber + t.numberOfContiguosBlocks - 1) != 1){
+		return 1;
+	}else return 0;
+
 }

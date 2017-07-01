@@ -82,3 +82,21 @@ int registerToSector(DWORD MFT);
 ** @ARGUMENTS: none 
 */
 DWORD findMFT();
+
+/* Boolean function to determine if a block is contiguous in a tuple
+** Main author: NATÁLIA GUBIANI RAMPON - 00262502
+** @RETURN: [INT] 1 - if contiguous
+**		  0 - if not contiguous
+** @ARGUMENTS: [INT - IN] mapped LBN
+**	       [T2FS_4TUPLA - IN] tuple in which the block is to be put
+*/
+int isContiguous(int bit, struct t2fs_4tupla t);
+
+/* Boolean function to determine if a VBN is sequential to mapping in a tuple
+** Main author: NATÁLIA GUBIANI RAMPON - 00262502
+** @RETURN: [INT] 1 - if sequential
+**		  0 - if not sequential
+** @ARGUMENTS: [DWORD - IN] requested VBN
+**	       [T2FS_4TUPLA - IN] tuple in which the VBN is to be put
+*/
+int isSequential(DWORD VBN, struct t2fs_4tupla t);

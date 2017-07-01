@@ -47,5 +47,14 @@ int main(){
 		printf("Mapeamento registro 6, VBN 2, LBN %u\n", LBN);
 	}
 
+	int i;
+
+	for(i = 0; i < 33 ; i++){
+		mapVBN(8,i,&LBN);
+		printf("\t\t\t\tReg 8, VBN %u, LBN %u\n", i, LBN);
+		mapVBN(9,i,&LBN);
+		printf("\t\t\t\tReg 9, VBN %u, LBN %u\n", i, LBN);
+	}
+
 	return 0;
 }
