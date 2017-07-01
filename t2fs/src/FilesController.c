@@ -103,7 +103,12 @@ struct t2fs_records getRecordByName(char *name, BYTE *sectors){
 	return NULL;
 }
 *****************************************************/
-
+char* getFileName(char *filename){
+	char *ptr;
+	if((ptr = strrchr(name, '/'))
+		return ptr+1;
+	else return NULL;
+}
 int isValidName(char *name){
     char current;
     int i = 0;
