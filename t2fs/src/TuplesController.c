@@ -274,16 +274,14 @@ DWORD findMFT(){
 
 int getFileBlockSize(DWORD MFT){
 
-	int i, j, counter = 0;
+	int i, counter = 0;
 	DWORD currentMFT = MFT;
-	j = 0;
-	struct t2fs_4tupla buffer[SECTOR_SIZE/sizeof(struct t2fs_4tupla)];
+	struct t2fs_4tupla buffer[32];
 
 	do{
-		read_sector(registerToSector(currentMFT)+j, (BYTE*)buffer);
-	
+		searchMFT(currentMFT,buffer);
 		i = 0;
-		while(i < SECTOR_SIZE/sizeof(struct t2fs_4tupla)){
+		while(i < 32){
 	
 			if(buffer[i].atributeType == MAPEAMENTO){
 				counter+=buffer[i].numberOfContiguosBlocks;
@@ -291,15 +289,15 @@ int getFileBlockSize(DWORD MFT){
 			else if(buffer[i].atributeType == FIM_ENCADEAMENTO){
 				return counter;
 			}
+			else if(buffer[i].atributeType == INVALID_PTR){
+				return 0;
+			}
+			i++;
 		}
 
 		if(buffer[i-1].atributeType == MFT_ADICIONAL){
 			currentMFT = buffer[i].virtualBlockNumber;
-			j = 0;
-		}else{
-			j+=1;
 		}
-
 	}while(1);
 
 	return -1;

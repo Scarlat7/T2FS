@@ -100,3 +100,11 @@ int isContiguous(int bit, struct t2fs_4tupla t);
 **	       [T2FS_4TUPLA - IN] tuple in which the VBN is to be put
 */
 int isSequential(DWORD VBN, struct t2fs_4tupla t);
+
+/* Returns the file size in number of blocks
+** Main author: NATÁLIA GUBIANI RAMPON - 00262502
+** @RETURN: [INT] if positive file Size
+**		  -1 if error occured
+** @ARGUMENTS: [DWORD - IN] MFT register of the file
+*/
+int getFileBlockSize(DWORD MFT);
