@@ -30,18 +30,14 @@ int getFileNumber(){
 
 
 int openFile(char *path){
-	struct t2fs_records fileRecord;
 	if(isOpen(path)) return ERROR;
 		
 	OPENFILES newFile;
 	int fileNumber;
 
-	fileRecord = getRecordsFile(path);
-
-	newFile.MFT = fileRecord.MFTNumber;
+	newFile.MFT = searchFile(path);
 	newFile.currentPointer = 0;
-	strcpy(fileRecord.name, path);	
-	newFile.size = fileRecord.bytesFileSize;
+	strcpy(newFile.name, path);	
 
 	if((fileNumber = getFileNumber())){
 		openFilesArray[fileNumber] = newFile;
@@ -50,66 +46,8 @@ int openFile(char *path){
 
 	else return ERROR;
 }
-
-struct t2fs_records getRecordsFile(char *path){
-	char *directorie;
-	struct t2fs_records actualRecord;
-	BYTE sectors = malloc(sectorsInBlock*SECTOR_SIZE);
-	int i, j;
-	DWORD rootBlocks = getRootBlocks();
-	DWORD currentLB;
-	
-	directorie = strtok(path, "/");	
-
-	for(i = 0; i < rootBlocks; i++){
-		currentLB = mapVBN(1, i);
-		initial_sector = blockToSector(currentLB);
-		for(j = 0; j < sectorsInBlock; j++){		
-			read_sector(initial_sector+j, sectors);
-			sectors+=SECTOR_SIZE;
-		}
-		
-		if(actualRecord = getRecordByName(directorie, sectors))
-			break;
-	}
-
-	if(actualRecord.TypeVal == 1)
-		return actualRecord;
-	 
-	while((directorie = strtok(NULL, "/")){
-		for(i = 0; i < actualRecord.blocksFileSize; i++){
-			currentLB = mapVBN(actualRecord.MFTNumber,i);
-			initial_sector = blockToSector(currentLB);
-			for(j = 0; j < sectorsInBlock; j++){
-				read_sector(initial_sector+j, sectors);
-				sectors+=SECTOR_SIZE;
-			}
-			if(actualRecord = getRecordByName(directorie, sectors))
-				break;
-		}
-
-		if(actualRecord.TypeVal == 1)
-			return actualRecord;
-	}
-
-	return ERROR;
-}
-
-struct t2fs_records getRecordByName(char *name, BYTE *sectors){
-	int RECORD_SIZE = sizeof(struct t2fs_records);	
-	int N_RECORDS = SECTOR_SIZE/RECORD_SIZE;
-	struct t2fs_records actual_record;
-	int i;
-	for(i = 0; i < N_RECORDS; i++){
-		memcpy(&actual_record, sectors+RECORD_SIZE*i, RECORD_SIZE)
-		if(strcmp(actual_record.name, name) == 0)
-			return actual_record; 
-	}
-
-	return NULL;
-}
-
 *****************************************************/
+
 int isValidName(char *name){
     char current;
     int i = 0;
@@ -123,9 +61,9 @@ int isValidName(char *name){
 
 /*
 int allocateBlock(struct t2fs_4tupla *vector){
-	int block, newVBN;
+	DWORD block, newVBN;
 	int i = 0, found = 0;
-	struct t2fs_4tupla newTuplas;
+	struct t2fs_4tupla newTuplas[32];
 
 	block = searchBitmap2(0);
 	if(block == 0) return -1;
@@ -164,6 +102,47 @@ int allocateBlock(struct t2fs_4tupla *vector){
 	return 0;	
 }
 */
+
+int addRecord(DWORD fatherReg, struct t2fs_record *record) {
+	int j, lastFound = 0;
+	struct t2fs_4tupla tuplas[32];
+	struct t2fs_record records[ctrl.boot.blockSize*4];
+	DWORD nextReg, newVBN, LBN, sector;
+	nextReg = fatherReg;
+	do {
+		j = 0;
+		searchMFT(nextReg, tuplas);
+		//Procura pela última tupla do pai
+		while(tuplas[j].atributeType == 1){
+			j++;
+		}
+		if(tuplas[j].atributeType == 0) {
+			if(j > 0) j--;
+			//Pega o último VBN
+			newVBN = tuplas[j].virtualBlockNumber + tuplas[j].numberOfContiguosBlocks;
+		}
+		nextReg = tuplas[31].virtualBlockNumber;
+	}while(tuplas[31].atributeType == 2);
+
+#ifdef DEBUG
+	printf("New VBN: %d\n", newVBN);
+#endif
+	//Atualiza registro MFT do pai - tá dando erro aqui
+	if(mapVBN(fatherReg, newVBN, &LBN)) return -1;
+	//Pega records desse LBN e chega até o fim
+	if(LBNToRecord(LBN, records)) return -1;
+	j = 0;
+	do {
+		if(records[j].TypeVal > 0 && records[j].TypeVal < 3) j++;
+		else lastFound = 1;
+	}while(lastFound == 0);
+	
+	//Mapeia LBN para setor
+	if(mapLBN(LBN, &sector)) return -1;
+	//Escreve o record adicionado logo abaixo do último
+	if(write_sector(sector + j, (unsigned char*)record)) return -1;
+	return 0;
+}
 
 void printRecords(DWORD reg){
 	int i, j, k;
@@ -207,7 +186,7 @@ int LBNToRecord(DWORD LBN, struct t2fs_record* records){
 	return 0;
 }
 
-//Compila, mas não testei
+//Funcionando
 DWORD hasFile(char *directories, DWORD currentReg) {
 	struct t2fs_4tupla tuplas[32];
 	struct t2fs_record records[ctrl.boot.blockSize*4];
@@ -216,8 +195,6 @@ DWORD hasFile(char *directories, DWORD currentReg) {
 
 	reg = currentReg;
 
-	if(directories == NULL) return reg;
-
 	do {
 		i = 0;
 		searchMFT(reg, tuplas);
@@ -225,7 +202,7 @@ DWORD hasFile(char *directories, DWORD currentReg) {
 			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
 					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) return -1;
 					reg = searchFile(records, directories);
-					if(reg) return hasFile(strtok(NULL, "/"), reg);
+					if(reg) return reg;
 			}
 			i++;
 		}while(tuplas[i].atributeType == 1);
@@ -234,11 +211,16 @@ DWORD hasFile(char *directories, DWORD currentReg) {
 	return -1;
 }
 
-//Compila, mas não testei
-DWORD pathExists(char *pathName) {
-	char *directories;
-	directories = strtok(pathName, "/");
-	return hasFile(directories, 0);
+//Funcionando
+DWORD pathExists(char *pathName, char *fileName) {
+	char *directories = strtok(pathName, "/");
+	DWORD reg = 1, i;
+	while(directories && strcmp(directories, fileName)){
+		i = hasFile(directories, reg);
+		reg = i;
+		directories = strtok(NULL, "/");
+	}
+	return reg;
 }
 /*
 //Função que imprime o conteúdo de um diretório, dado seu setor e tamanho em bytes

@@ -25,6 +25,13 @@
 */
 int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN);
 
+/* Maps the program Logical Block Number (LBN) to a disk Sector
+** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517	
+** @RETURN: 0 - if executed without errors
+**          -1 - error
+** @ARGUMENTS:[IN - DWORD] LBN - Logical Block Number
+** 	      [OUT - DWORD] sector
+*/
 int mapLBN(DWORD LBN, DWORD* sector);
 
 /* Reads the requested sectors from file on disk

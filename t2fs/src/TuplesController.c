@@ -125,6 +125,7 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 #endif
 	
 	if(bufferT[0].atributeType == INVALID_PTR && VBN != 0){
+		printf("Type: %d\tVBN: %d\n", bufferT[0].atributeType, VBN);
 		fprintf(stderr,"MFT invalido para mapeamento.\n");
 		return -1;
 	}
