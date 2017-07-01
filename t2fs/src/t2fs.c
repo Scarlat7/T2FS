@@ -27,6 +27,38 @@ int read2 (FILE2 handle, char *buffer, int size){
 		memcpy(buffer, bufferAux+relativeByte, size);
 	else return ERROR;	
 }
+int write2(FILE2 handle, char *buffer, int size){
+	BYTE *escrita;	
+	int i;
+	DWORD mft = openFilesArray[handle].MFT;
+	DWORD n_blocks = bytesToBlocks(openFilesArray[handle].size);
+	DWORD pointerBlocks = bytesToBlocks(openFilesArray[handle].currentPointer);
+
+	DWORD relativeByte = openFilesArray[handle].currentPointer % SIZE_SECTOR;	
+	DWORD n_sectors = size/SECTOR_SIZE;
+	if(size%SECTOR_SIZE != 0)
+		n_sectors++;
+
+	escrita = malloc(n_sectors*SECTOR_SIZE);
+	  
+	for(i = 0; i < n_blocks-pointerBlocks; i++){
+		currentLB = mapVBN(mft, i+pointerBlocks);
+		initial_sector = blocksToSector(currentLB);
+		for(j = 0; j < sectorsInBlock; j++){
+			read_sector(initial_sector+j, escrita+i*BLOCK_SIZE+j*SECTOR_SIZE)
+		}
+	}
+	
+	memcpy(escrita+relativeByte, buffer, size);
+	
+	for(i = 0; i < n_blocks-pointerBlocks; i++){
+		currentLB = mapVBN(mft, i+pointerBlocks);
+		initial_sector = blocksToSector(currentLB);
+		for(j = 0; j < sectorsInBlock; j++){
+			write_sector(initial_sector+j, escrita+i*BLOCK_SIZE+j*SECTOR_SIZE)
+		}
+	}
+}
 *********************************************/
 int mkdir2 (char *pathname){
 	char *last = strrchr(pathname, '/');
