@@ -101,12 +101,12 @@ int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
  
 int registerToSector(DWORD MFT){
 
-	if(MFT > ctrl.boot.MFTBlocksSize || MFT < 0){
+	if(MFT > (ctrl.boot.MFTBlocksSize/ctrl.boot.blockSize*2) || MFT < 0){
 		fprintf(stderr, "Registro MFT requisitado fora dos limites.\n");
 		return -1;
 	}
 
-	return (MFT + 1)*ctrl.boot.blockSize;
+	return ctrl.boot.blockSize + MFT*2;
 }
 
 
@@ -125,7 +125,6 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 #endif
 	
 	if(bufferT[0].atributeType == INVALID_PTR && VBN != 0){
-		printf("Type: %d\tVBN: %d\n", bufferT[0].atributeType, VBN);
 		fprintf(stderr,"MFT invalido para mapeamento.\n");
 		return -1;
 	}
@@ -272,4 +271,37 @@ DWORD findMFT(){
 
 	fprintf(stderr, "Disk is full, impossible to find a MFT register.\n");
 	return 0;
+}
+
+int getFileBlockSize(DWORD MFT){
+
+	int i, j, counter = 0;
+	DWORD currentMFT = MFT;
+	j = 0;
+	struct t2fs_4tupla buffer[SECTOR_SIZE/sizeof(struct t2fs_4tupla)];
+
+	do{
+		read_sector(registerToSector(currentMFT)+j, (BYTE*)buffer);
+	
+		i = 0;
+		while(i < SECTOR_SIZE/sizeof(struct t2fs_4tupla)){
+	
+			if(buffer[i].atributeType == MAPEAMENTO){
+				counter+=buffer[i].numberOfContiguosBlocks;
+			}
+			else if(buffer[i].atributeType == FIM_ENCADEAMENTO){
+				return counter;
+			}
+		}
+
+		if(buffer[i-1].atributeType == MFT_ADICIONAL){
+			currentMFT = buffer[i].virtualBlockNumber;
+			j = 0;
+		}else{
+			j+=1;
+		}
+
+	}while(1);
+
+	return -1;
 }

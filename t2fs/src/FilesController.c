@@ -115,17 +115,19 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 		//Procura pela última tupla do pai
 		while(tuplas[j].atributeType == 1){
 			j++;
+			printf("ENTROU NO MAPEAMENTO");
 		}
 		if(tuplas[j].atributeType == 0) {
 			if(j > 0) j--;
 			//Pega o último VBN
 			newVBN = tuplas[j].virtualBlockNumber + tuplas[j].numberOfContiguosBlocks;
+			printf("ENTROU NO MAPEMANETO ENCONTROU FIM.\n");
 		}
 		nextReg = tuplas[31].virtualBlockNumber;
 	}while(tuplas[31].atributeType == 2);
 
 #ifdef DEBUG
-	printf("New VBN: %d\n", newVBN);
+	printf("New VBN: %d, fatherReg %u\n", newVBN, fatherReg);
 #endif
 	//Atualiza registro MFT do pai - tá dando erro aqui
 	if(mapVBN(fatherReg, newVBN, &LBN)) return -1;
