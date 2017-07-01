@@ -186,7 +186,7 @@ int allocateBlock(struct t2fs_4tupla *vector){
 
 
 int addRecord(DWORD fatherReg, struct t2fs_record *record) {
-	int j, i, lastFound = 0;
+	int j, i, desloc, lastFound = 0;
 	struct t2fs_4tupla tuplas[32];
 	struct t2fs_record records[ctrl.boot.blockSize*4];
 	struct t2fs_record recSec[4];
@@ -217,11 +217,12 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 		else lastFound = 1;
 	}while(lastFound == 0);
 	
-	//Mapeia LBN para setor
+	//Mapeia LBN para setor de início
 	if(mapLBN(LBN, &sector)) return -1;
 	
-	if(read_sector(sector, (unsigned char*) recSec)) return -1;
-	recSec[j] = *record;
+	desloc = j / 4;
+	if(read_sector(sector + desloc, (unsigned char*) recSec)) return -1;
+	recSec[j%4] = *record;
 
 #ifdef DEBUG
 	for(i=0; i<4; i++){
@@ -229,10 +230,9 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 	}
 #endif
 	//Escreve o record adicionado logo abaixo do último
-	if(write_sector(sector, (unsigned char*)recSec)) return -1;
+	if(write_sector(sector + desloc, (unsigned char*)recSec)) return -1;
 	return 0;
 }
-
 void printRecords(DWORD reg){
 	int i, j, k;
 	struct t2fs_4tupla tuplas[32];
