@@ -60,7 +60,7 @@ int write2(FILE2 handle, char *buffer, int size){
 	}
 }
 *********************************************/
-int create2 (char *filename){
+FILE2 create2 (char *filename){
 	char *name;
 	struct t2fs_record newRecord;
 	DWORD mftDir;
@@ -77,7 +77,7 @@ int create2 (char *filename){
 	if(addRecord(mftDir, &newRecord))
 		return ERROR;
 
-	return 0;
+	return openFile(filename);
 	
 }
 int mkdir2 (char *pathname){
