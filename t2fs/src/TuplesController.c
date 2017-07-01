@@ -101,12 +101,13 @@ int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
  
 int registerToSector(DWORD MFT){
 
-	if(MFT > (ctrl.boot.MFTBlocksSize/ctrl.boot.blockSize*2) || MFT < 0){
+	if(MFT > ((ctrl.boot.MFTBlocksSize*ctrl.boot.blockSize)/2 - 1) || MFT < 0){
 		fprintf(stderr, "Registro MFT requisitado fora dos limites.\n");
 		return -1;
 	}
 
 	return ctrl.boot.blockSize + MFT*2;
+
 }
 
 
