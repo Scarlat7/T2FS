@@ -212,8 +212,7 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 						// lookUpMFT vai procurar o próximo MFT válido, se for executada sem erros devolve um MFT >0
 						// se nao possuir mais MFT disponíveis retorna 0
 						// se der erro -1
-				write_sector(registerToSector(currentMFT), (BYTE*) bufferT);
-				write_sector(registerToSector(currentMFT)+1,(BYTE*) bufferT+SECTOR_SIZE);
+				writeRegister(currentMFT, bufferT);
 				read_sector(registerToSector(newMFT), (BYTE*)bufferNew);
 				bufferNew[0].atributeType = MAPEAMENTO;
 				bufferNew[1].atributeType = FIM_ENCADEAMENTO;
@@ -236,8 +235,7 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 					
 				if(isContiguous(bit, bufferT[i-1])){
 					bufferT[i-1].numberOfContiguosBlocks++;	
-					write_sector(registerToSector(currentMFT), (BYTE*) bufferT);
-					write_sector(registerToSector(currentMFT)+1, (BYTE*) bufferT+SECTOR_SIZE);
+					writeRegister(currentMFT, bufferT);
 #ifdef DEBUG
 					printf("MAPEAMENTO CONTIGUO:\n"); 
 					printf("\tTupla num %d modificada do registro %d\n", i-1, currentMFT);
@@ -253,8 +251,7 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 				bufferT[i].numberOfContiguosBlocks = 1;
 	
 				bufferT[i+1].atributeType = FIM_ENCADEAMENTO;
-				write_sector(registerToSector(currentMFT), (BYTE*) bufferT);
-				write_sector(registerToSector(currentMFT)+1,(BYTE*) bufferT+SECTOR_SIZE);
+				writeRegister(currentMFT, bufferT);
 #ifdef DEBUG
 				printf("MAPEAMENTO NOVA TUPLA:\n"); 
 				printf("\tTupla num %d (anterior):type %d VBN %u LBN %u cont %d\n", i, bufferT[i].atributeType,
