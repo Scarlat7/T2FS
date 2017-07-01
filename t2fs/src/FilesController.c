@@ -8,19 +8,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/******************************************
-	COMENTEI PRA NÃO ZOAR A COMPILAÇÃO
+
 void init_openFilesArray(){
 	int i = 0;
 	for(i = 0; i < N_OPENFILES; i++){
-		openFilesArray[i] = -1;
+		openFilesArray[i].MFT = -1;
 	}
 }
 
 int getFileNumber(){
 	int i;	
 	for(i = 0; i < N_OPENFILES; i++){
-		if(openFilesArray[i] == -1){
+		if(openFilesArray[i].MFT == -1){
 			return i;		
 		}
 	}
@@ -30,18 +29,18 @@ int getFileNumber(){
 
 
 int openFile(char *path){
-	struct t2fs_records fileRecord;
-	if(isOpen(path)) return ERROR;
+	struct t2fs_record* fileRecord;
+	//if(isOpen(path)) return ERROR;
 		
 	OPENFILES newFile;
 	int fileNumber;
 
 	fileRecord = getRecordsFile(path);
 
-	newFile.MFT = fileRecord.MFTNumber;
+	newFile.MFT = fileRecord->MFTNumber;
 	newFile.currentPointer = 0;
-	strcpy(fileRecord.name, path);	
-	newFile.size = fileRecord.bytesFileSize;
+	strcpy(fileRecord->name, path);	
+	newFile.size = fileRecord->bytesFileSize;
 
 	if((fileNumber = getFileNumber())){
 		openFilesArray[fileNumber] = newFile;
@@ -50,84 +49,91 @@ int openFile(char *path){
 	else return ERROR;
 }
 
-struct t2fs_records getRecordsFile(char *path){
+struct t2fs_record* getRecordsFile(char *path){
 	char *directorie;
-	struct t2fs_records actualRecord;
-	BYTE sectors = malloc(sectorsInBlock*SECTOR_SIZE);
+	struct t2fs_record* actualRecord = malloc(sizeof(struct t2fs_record));
+	BYTE *sectors;
+	sectors = (BYTE*)malloc(ctrl.boot.blockSize*SECTOR_SIZE);
 	int i, j;
-	DWORD rootBlocks = getRootBlocks();
-	DWORD currentLB;
+	DWORD rootBlocks = getFileBlockSize(1);
+	DWORD currentLB, initial_sector;
 	
 	directorie = strtok(path, "/");	
 	for(i = 0; i < rootBlocks; i++){
-		currentLB = mapVBN(1, i);
-		initial_sector = blockToSector(currentLB);
-		for(j = 0; j < sectorsInBlock; j++){		
+		mapVBN(1, i, &currentLB);
+		if(mapLBN(currentLB, &initial_sector) == ERROR)
+			return NULL;
+
+		for(j = 0; j < ctrl.boot.blockSize; j++){		
 			read_sector(initial_sector+j, sectors);
 			sectors+=SECTOR_SIZE;
 		}
 		
-		if(actualRecord = getRecordByName(directorie, sectors))
+		if((actualRecord = getRecordByName(directorie, sectors)) != NULL)
 			break;
 	}
-	if(actualRecord.TypeVal == 1)
+
+	if(actualRecord->TypeVal == 1)
 		return actualRecord;
 	 
-	while((directorie = strtok(NULL, "/")){
-		for(i = 0; i < actualRecord.blocksFileSize; i++){
-			currentLB = mapVBN(actualRecord.MFTNumber,i);
-			initial_sector = blockToSector(currentLB);
-			for(j = 0; j < sectorsInBlock; j++){
+	while((directorie = strtok(NULL, "/"))){
+		for(i = 0; i < actualRecord->blocksFileSize; i++){
+			mapVBN(actualRecord->MFTNumber,i, &currentLB);
+			if(mapLBN(currentLB, &initial_sector) == ERROR)
+				return NULL;
+			for(j = 0; j < ctrl.boot.blockSize; j++){
 				read_sector(initial_sector+j, sectors);
 				sectors+=SECTOR_SIZE;
 			}
-			if(actualRecord = getRecordByName(directorie, sectors))
+			if((actualRecord = getRecordByName(directorie, sectors)) != NULL)
 				break;
 		}
-		if(actualRecord.TypeVal == 1)
+		if(actualRecord->TypeVal == 1)
 			return actualRecord;
 	}
-	return ERROR;
+	return NULL;
 }
 
-struct t2fs_records getRecordByName(char *name, BYTE *sectors){
-	int RECORD_SIZE = sizeof(struct t2fs_records);	
+struct t2fs_record* getRecordByName(char *name, BYTE *sectors){
+	int RECORD_SIZE = sizeof(struct t2fs_record);	
 	int N_RECORDS = SECTOR_SIZE/RECORD_SIZE;
-	struct t2fs_records actual_record;
+	struct t2fs_record* actual_record = malloc(sizeof(struct t2fs_record));
 	int i;
 	for(i = 0; i < N_RECORDS; i++){
-		memcpy(&actual_record, sectors+RECORD_SIZE*i, RECORD_SIZE)
-		if(strcmp(actual_record.name, name) == 0)
+		memcpy(actual_record, sectors+RECORD_SIZE*i, RECORD_SIZE);
+		if(strcmp(actual_record->name, name) == 0)
 			return actual_record; 
 	}
 	return NULL;
 }
-*****************************************************/
+
 char* getFileName(char *filename){
 	char *ptr;
-	if((ptr = strrchr(name, '/'))
+	if((ptr = strrchr(filename, '/')))
 		return ptr+1;
 	else return NULL;
 }
 
-struct t2fs_records createFile(char* name, short int typeVal){
-	struct t2fs_records newRecord;
-	DWORD newMFT, DWORD LBN;
+struct t2fs_record* createFile(char* name, short int typeVal){
+	struct t2fs_record* newRecord = malloc(sizeof(struct t2fs_record));
+	DWORD newMFT, LBN;
 
 	if((newMFT = findMFT()) <= 0)
 		return NULL;
 
-	if((mapVBN(newMFT, 0, &LBN) < 0)
+	if(mapVBN(newMFT, 0, &LBN) < 0)
 		return NULL;
 
-	newRecord.TypeVal = typeVal;
-	strcpy(newRecord.name, name);
-	newRecord.blocksFileSize = 1;
-	newRecord.bytesFileSize = ctrl.boot.blockSize*SECTOR_SIZE;
-	newRecord.MFTNumber = newMFT;	
+	newRecord->TypeVal = typeVal;
+	strcpy(newRecord->name, name);
+	newRecord->blocksFileSize = 1;
+	newRecord->bytesFileSize = ctrl.boot.blockSize*SECTOR_SIZE;
+	newRecord->MFTNumber = newMFT;	
 	
 	return newRecord;
 }
+
+
 
 int isValidName(char *name){
     char current;

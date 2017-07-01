@@ -26,25 +26,25 @@ OPENFILES openFilesArray[N_OPENFILES];
 
 
 /*retorna o nome do arquivo a partir do path*/
-//char* getFileName(char *filename);
+char* getFileName(char *filename);
 
 /*cria um registro mft pro novo arquivo e retorna seu record*/
-//struct t2fs_records createFile(char* name, short int typeVal);
+struct t2fs_record* createFile(char* name, short int typeVal);
 
 /*inicializa o openFilesArray com -1*/
-//void init_openFilesArray();
+void init_openFilesArray();
 
 /*verifica no array de arquivos aberto se há um handle disponível*/
-//int getFileNumber();
+int getFileNumber();
 
 /*abre um arquivo e retorna o handle*/
-//int openFile(char *path);
+int openFile(char *path);
 
 /*retorna um record do file especificado*/
-//struct t2fs_records getRecordsFile(char *path);
+struct t2fs_record* getRecordsFile(char *path);
 
 /*procura numa região de memória o record com o nome especificado e o retorna*/
-//struct t2fs_records getRecordByName(char *name, BYTE *sectors);
+struct t2fs_record* getRecordByName(char *name, BYTE *sectors);
 
 /* Verifies if the passed parameter is valid
 ** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517

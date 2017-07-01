@@ -20,8 +20,9 @@ FIND=findMFT
 VBN=mapVBN
 MKDIR=mkdir
 ADD=addRecord
+CREATE2=create2
 
-all: T_$(INIT) T_$(READBOOT) T_$(VALIDNAME) T_$(SEARCHMFT) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD)
+all: T_$(INIT) T_$(READBOOT) T_$(VALIDNAME) T_$(SEARCHMFT) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(CREATE2)
 
 T_$(INIT): T_$(INIT).c $(BIN_DIR)/BootController.o $(BIN_DIR)/apidisk.o
 	$(CC) -o T_$(INIT) T_$(INIT).c -I$(INC_DIR)/ $(BIN_DIR)/BootController.o $(BIN_DIR)/apidisk.o $(CFLAGS)
@@ -53,5 +54,8 @@ T_$(MKDIR): T_$(MKDIR).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BI
 T_$(ADD): T_$(ADD).c $(BIN_DIR)/FilesController.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/TuplesController.o
 	$(CC) -o T_$(ADD) T_$(ADD).c -I$(INC_DIR)/ $(BIN_DIR)/FilesController.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/TuplesController.o $(CFLAGS)
 
+T_$(CREATE2): T_$(CREATE2).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
+	$(CC) -o T_$(CREATE2) T_$(CREATE2).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+
 clean:
-	rm -rf *.o *~ T_$(INIT) T_$(READBOOT) T_$(SEARCHMFT) T_$(VALIDNAME) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD)
+	rm -rf *.o *~ T_$(INIT) T_$(READBOOT) T_$(SEARCHMFT) T_$(VALIDNAME) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(CREATE2) 
