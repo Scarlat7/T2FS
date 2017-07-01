@@ -109,6 +109,26 @@ char* getFileName(char *filename){
 		return ptr+1;
 	else return NULL;
 }
+
+struct t2fs_records createFile(char* name, short int typeVal){
+	struct t2fs_records newRecord;
+	DWORD newMFT, DWORD LBN;
+
+	if((newMFT = findMFT()) <= 0)
+		return NULL;
+
+	if((mapVBN(newMFT, 0, &LBN) < 0)
+		return NULL;
+
+	newRecord.TypeVal = typeVal;
+	strcpy(newRecord.name, name);
+	newRecord.blocksFileSize = 1;
+	newRecord.bytesFileSize = ctrl.boot.blockSize*SECTOR_SIZE;
+	newRecord.MFTNumber = newMFT;	
+	
+	return newRecord;
+}
+
 int isValidName(char *name){
     char current;
     int i = 0;
@@ -163,6 +183,7 @@ int allocateBlock(struct t2fs_4tupla *vector){
 	return 0;	
 }
 */
+
 
 int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 	int j, i, lastFound = 0;

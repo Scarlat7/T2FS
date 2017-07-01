@@ -25,6 +25,11 @@ typedef struct openFiles{
 OPENFILES openFilesArray[N_OPENFILES];
 
 
+/*retorna o nome do arquivo a partir do path*/
+//char* getFileName(char *filename);
+
+/*cria um registro mft pro novo arquivo e retorna seu record*/
+//struct t2fs_records createFile(char* name, short int typeVal);
 
 /*inicializa o openFilesArray com -1*/
 //void init_openFilesArray();

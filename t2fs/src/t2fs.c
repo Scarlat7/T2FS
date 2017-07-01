@@ -60,6 +60,26 @@ int write2(FILE2 handle, char *buffer, int size){
 	}
 }
 *********************************************/
+int create2 (char *filename){
+	char *name;
+	struct t2fs_record newRecord;
+	DWORD mftDir;
+
+	if((name = getFileName(filename) == NULL)
+		return ERROR;
+	
+	if((mftDir = pathExists(filename, name)) <= 0)
+		return ERROR;
+
+	if((newRecord = createFile(name, 1)) == NULL)
+		return ERROR;
+
+	if(addRecord(mftDir, &newRecord))
+		return ERROR;
+
+	return 0;
+	
+}
 int mkdir2 (char *pathname){
 	char *last = strrchr(pathname, '/');
 	char dirName[MAX_FILE_NAME_SIZE];
