@@ -1,4 +1,4 @@
-/******************************
+﻿/******************************
 * FILES CONTROLLER COMPONENT
 * MAIN AUTHORS: LAUREN SILVA ROLAN SAMPAIO - 00262517
 *               LEONARDO DA LUZ DORNELES - 00262516
@@ -123,12 +123,45 @@ DWORD searchFile(struct t2fs_record *records, char *name);
 */
 int isOpen(char *pathname, int type);
 
+/* Verifies if the file given by handle is already open
+** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
+** @RETURN:	0 - if it is not open
+**		1 - if it is open
+**		-1 - in case of invalid type
+** @ARGUMENTS: 	[IN - int] handle
+**		[IN - int] type - 1, search file
+**				- 2, search directory
+*/
+int isOpenH(int handle, int type);
+
+/* Returns a file based on its pathname and father's MFT register
+** Main author: LEONARDO DA LUZ DORNELES - 00262516
+** @RETURN:	struct file
+** @ARGUMENTS: 	[IN - char*] name - file's name
+**		[IN - DWORD] fatherReg - father register
+*/
 OPENFILE getFile(DWORD fatherReg, char *name);
 
-/* Returns a directory based in its pathname and father's MFT register
+/* Returns a directory based on its pathname and father's MFT register
 ** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
 ** @RETURN:	struct directory 
 ** @ARGUMENTS: 	[IN - char*] name - directory's name
 **		[IN - DWORD] fatherReg - father register
 */
 OPENDIRECTORY getDir(DWORD fatherReg, char *name);
+
+/* Returns the pos-th valid record name in the directory pointed by fatherMFT
+** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
+** @RETURN:	[CHAR*] - record's name
+** @ARGUMENTS: 	[IN - DWORD] pos - n-th valid name
+**		[IN - DWORD] fatherReg - father register
+*/
+char* getRecordName(DWORD fatherReg, DWORD pos);
+
+/* Returns a record in the MFT register reg named as name
+** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
+** @RETURN:	struct record
+** @ARGUMENTS: 	[IN - DWORD] reg - father register
+**		[IN - char*] name - name of the record
+*/
+struct t2fs_record * findRecord(DWORD reg, char *name);

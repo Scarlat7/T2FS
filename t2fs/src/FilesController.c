@@ -1,4 +1,4 @@
-#include "FilesController.h"
+﻿#include "FilesController.h"
 #include "TuplesController.h"
 #include "apidisk.h"
 
@@ -213,16 +213,15 @@ int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
 	return -1;
 }
 
-struct t2fs_record * findRecord(DWORD reg, char *name) {
+struct t2fs_record* findRecord(DWORD reg, char *name) {
 	int i, j, k;
 	struct t2fs_4tupla tuplas[32];
-	//struct t2fs_record records[ctrl.boot.blockSize*4];
-	struct t2fs_record *records = malloc(ctrl.boot.blockSize*4);
+	struct t2fs_record *records = malloc(ctrl.boot.blockSize*4*sizeof(struct t2fs_record));
 
 	if(reg == -1) return NULL;
 	do {
 		i = 0;
-		searchMFT(reg, tuplas); 
+		searchMFT(reg, tuplas);
 		do {
 			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
 
@@ -363,4 +362,15 @@ OPENDIRECTORY getDir(DWORD fatherReg, char *name) {
 		strcpy(dir.name, record->name);
 	}	
 	return dir;
+}
+
+int isOpenH(int handle, int type) {
+	switch(type) {
+		case 1: if(ctrl.openFilesArray[handle].valid != -1) return 1;
+			break;
+		case 2: if(ctrl.openDirectoriesArray[handle].valid != -1) return 1;
+			break;
+		default: return -1;
+	}
+	return 0;
 }
