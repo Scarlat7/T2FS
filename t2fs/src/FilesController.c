@@ -1,30 +1,18 @@
 #include "FilesController.h"
-#include "BootController.h"
 #include "TuplesController.h"
-#include "t2fs.h"
 #include "apidisk.h"
 
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-/******************************************
-	COMENTEI PRA NÃO ZOAR A COMPILAÇÃO
-void init_openFilesArray(){
-	int i = 0;
-	for(i = 0; i < N_OPENFILES; i++){
-		openFilesArray[i] = -1;
-	}
-}
-*/
-
 int getHandle(int type){
 	int i;	
 	switch(type) {
-		1: for(i = 0; i < N_OPENFILES; i++)
+		case 1: for(i = 0; i < N_OPENFILES; i++)
 			if(ctrl.openFilesArray[i].valid == -1) return i;
 			break;
-		2: for(i = 0; i < N_OPENDIRECTORIES; i++)
+		case 2: for(i = 0; i < N_OPENDIRECTORIES; i++)
 			if(ctrl.openDirectoriesArray[i].valid == -1) return i;
 			break;
 		default: return -1;
@@ -204,6 +192,28 @@ int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
 	return -1;
 }
 
+struct t2fs_record * findRecord(DWORD reg, char *name) {
+	int i, j, k;
+	struct t2fs_4tupla tuplas[32];
+	struct t2fs_record records[ctrl.boot.blockSize*4];
+	if(reg == -1) return NULL;
+	do {
+		i = 0;
+		searchMFT(reg, tuplas); 
+		do {
+			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
+
+					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) return NULL;
+					for(k=0; k < ctrl.boot.blockSize*4; k++)
+						if(strcmp(records[k].name, name) == 0) return &records[k];
+			}			
+			i++;
+		}while(tuplas[i].atributeType == 1);
+		reg = tuplas[i].virtualBlockNumber;
+	}while(tuplas[31].atributeType == 2);
+	return NULL;
+}
+
 void printRecords(DWORD reg){
 	int i, j, k;
 	struct t2fs_4tupla tuplas[32];
@@ -215,7 +225,7 @@ void printRecords(DWORD reg){
 		do {
 			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
 					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) break;
-					for(k=0; k < ctrl.boot.blockSize; k++) printf("Name: %s\tType: %d\tBlocks: %d\tBytes: %d\n", records[k].name, records[k].TypeVal, records[k].blocksFileSize, records[k].bytesFileSize);
+					for(k=0; k < ctrl.boot.blockSize*4; k++) printf("Name: %s\tType: %d\tBlocks: %d\tBytes: %d\n", records[k].name, records[k].TypeVal, records[k].blocksFileSize, records[k].bytesFileSize);
 			}
 			i++;
 		}while(tuplas[i].atributeType == 1);
@@ -290,10 +300,10 @@ int isOpen(char *pathname, int type){
 	int i;
 	char *name = getFileName(pathname);
 	switch(type) {
-		1: for(i=0; i < N_OPENFILES; i++)
+		case 1: for(i=0; i < N_OPENFILES; i++)
 			if(strcmp(ctrl.openFilesArray[i].name, name) == 0) return 1;
 			break;
-		2: for(i=0; i < N_OPENDIRECTORIES; i++)
+		case 2: for(i=0; i < N_OPENDIRECTORIES; i++)
 			if(strcmp(ctrl.openDirectoriesArray[i].name, name) == 0) return 1;
 			break;
 		default: return -1;
@@ -301,3 +311,17 @@ int isOpen(char *pathname, int type){
 	return 0;
 }
 
+OPENDIRECTORY getDir(DWORD fatherReg, char *name) {
+	OPENDIRECTORY dir;
+	struct t2fs_record *record = findRecord(fatherReg, name);
+	if(record == NULL) printf("Deu ruim no findRecord.\n");
+	else {
+		dir.valid = 1;
+		dir.currentPointer = 0;
+		dir.blocksSize = record->blocksFileSize;
+		dir.bytesSize = record->bytesFileSize;
+		dir.MFT = hasFile(name, fatherReg);
+		strcpy(dir.name, record->name);
+	}	
+	return dir;
+}

@@ -15,30 +15,32 @@
 
 /** Control struct for library data static data */
 
-typedef struct openFiles{
+typedef struct openFile{
 	int valid;
 	DWORD MFT;
 	DWORD currentPointer;
-	DWORD size;
+	DWORD blocksSize;
+	DWORD bytesSize;
 	char name[MAX_FILE_NAME_SIZE];
 	char sectorBuffer[SECTOR_SIZE];
 
-}OPENFILES;
+}OPENFILE;
 
-typedef struct openDirectories{
+typedef struct openDirectory{
 	int valid;
 	DWORD MFT;
 	DWORD currentPointer;
-	DWORD size;
+	DWORD blocksSize;
+	DWORD bytesSize;
 	char name[MAX_FILE_NAME_SIZE];
 
-}OPENDIRECTORIES;
+}OPENDIRECTORY;
 
 typedef struct s_Control {
 	
 	struct t2fs_bootBlock boot;
-	OPENFILES openFilesArray[N_OPENFILES];
-	OPENDIRECTORIES openDirectoriesArray[N_OPENDIRECTORIES];
+	OPENFILE openFilesArray[N_OPENFILES];
+	OPENDIRECTORY openDirectoriesArray[N_OPENDIRECTORIES];
 	int N_OpenFiles;
 	int N_OpenDirectories;
 

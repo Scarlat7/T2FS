@@ -6,8 +6,11 @@
 	t_control ctrl;
 
 int init_lib(){
+	int i;
 	ctrl.N_OpenFiles = 0;
 	ctrl.N_OpenDirectories = 0;
+	for(i = 0; i < N_OPENFILES; i++) ctrl.openFilesArray[i].valid = -1;
+	for(i = 0; i < N_OPENDIRECTORIES; i++) ctrl.openDirectoriesArray[i].valid = -1;
 	read_boot_section();
 
 	return 0;

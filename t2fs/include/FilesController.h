@@ -9,9 +9,10 @@
 
 #include <stdio.h>
 #include "t2fs.h"
+#include "BootController.h"
 
 /*retorna o nome do arquivo a partir do path*/
-//char* getFileName(char *filename);
+char* getFileName(char *filename);
 
 /*cria um registro mft pro novo arquivo e retorna seu record*/
 //struct t2fs_records createFile(char* name, short int typeVal);
@@ -121,3 +122,11 @@ DWORD searchFile(struct t2fs_record *records, char *name);
 **				- 2, search directory
 */
 int isOpen(char *pathname, int type);
+
+/* Returns a directory based in its pathname and father's MFT register
+** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
+** @RETURN:	struct directory 
+** @ARGUMENTS: 	[IN - char*] name - directory's name
+**		[IN - DWORD] fatherReg - father register
+*/
+OPENDIRECTORY getDir(DWORD fatherReg, char *name);

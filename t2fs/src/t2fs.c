@@ -1,7 +1,5 @@
 #include "FilesController.h"
 #include "TuplesController.h"
-#include "BootController.h"
-#include "t2fs.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -118,7 +116,7 @@ int mkdir2 (char *pathname){
 	}
 	return -1;
 }
-
+/***********************************************************
 int rmdir2 (char *pathname){
 	char *last = strrchr(pathname, '/');
 	char dirName[MAX_FILE_NAME_SIZE];
@@ -143,12 +141,21 @@ int rmdir2 (char *pathname){
 	}
 	return -1;
 }
+**************************************************************/
 
 DIR2 opendir2 (char *pathname) {
 	int newHandle;
-	if(isOpen(pathName, 2)) return -1; //Working
+	char *dirName = getFileName(pathname);
+	DWORD fatherReg = pathExists(pathname, dirName);
+	
+	//Verifica se diretório existe
+	if(fatherReg <= 0) return -1;
+	if(hasFile(dirName, fatherReg) == -1) return -1;
+	//Verifica se está aberto
+	if(isOpen(pathname, 2)) return -1; //Working
+	//Verifica se há espaço
 	newHandle = getHandle(2);
 	if(newHandle == -1) return -1;
-	ctrl.openDirectoriesArray[newHandle] = getDir(pathname);
+	ctrl.openDirectoriesArray[newHandle] = getDir(fatherReg, dirName);
 	return newHandle;
 }
