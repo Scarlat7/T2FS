@@ -1,4 +1,4 @@
-#include "FilesController.h"
+﻿#include "FilesController.h"
 #include "TuplesController.h"
 
 #include <stdio.h>
@@ -171,3 +171,23 @@ DIR2 opendir2 (char *pathname) {
 	ctrl.openDirectoriesArray[newHandle] = getDir(fatherReg, dirName);
 	return newHandle;
 }
+
+/*************************************************************
+int readdir2 (DIR2 handle, DIRENT2 *dentry) {
+	char *recordName;
+	struct t2fs_record *record = malloc(sizeof(struct t2fs_record));
+	if(isOpenH(handle, 2) != 1) return -2;
+	//Busca pelo record apontado por reader.currentEntry
+	//Criar função que, com base no reader.currentEntry e no reader.MFT,
+	//retorna um nome válido para pesquisar via findRecord
+	recordName = getRecordName(ctrl.openDirectoriesArray[handle].MFT, ctrl.openDirectoriesArray[handle].currentEntry);
+	if(recordName == NULL) return -2; //Caso não exista
+	if(strcmp(recordName, "")) return -1;	//Caso tenha acabado
+	record = findRecord(ctrl.openDirectoriesArray[handle].MFT, recordName);
+	//Converter record -> dirent2
+	ctrl.openDirectoriesArray[handle].currentEntry ++;
+	free(record);
+	return 0;
+}
+
+*************************************************************/
