@@ -15,7 +15,7 @@
 char* getFileName(char *filename);
 
 /*cria um registro mft pro novo arquivo e retorna seu record*/
-//struct t2fs_records createFile(char* name, short int typeVal);
+struct t2fs_record* createFile(char* name, short int typeVal);
 
 /*inicializa o openFilesArray com -1*/
 //void init_openFilesArray();
@@ -122,6 +122,8 @@ DWORD searchFile(struct t2fs_record *records, char *name);
 **				- 2, search directory
 */
 int isOpen(char *pathname, int type);
+
+OPENFILE getFile(DWORD fatherReg, char *name);
 
 /* Returns a directory based in its pathname and father's MFT register
 ** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517

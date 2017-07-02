@@ -129,7 +129,7 @@ char* getFileName(char *filename){
 }
 
 
-/************************************************************
+
 struct t2fs_record* createFile(char* name, short int typeVal){
 	struct t2fs_record* newRecord = malloc(sizeof(struct t2fs_record));
 	DWORD newMFT, LBN;
@@ -148,7 +148,6 @@ struct t2fs_record* createFile(char* name, short int typeVal){
 	
 	return newRecord;
 }
-******************************************************************/
 
 int isValidName(char *name){
     char current;
@@ -331,6 +330,21 @@ int isOpen(char *pathname, int type){
 		default: return -1;
 	}
 	return 0;
+}
+
+OPENFILE getFile(DWORD fatherReg, char *name){
+	OPENFILE file;
+	struct t2fs_record *record = findRecord(fatherReg, name);
+	if(record == NULL) printf("Deu ruim no findRecord.\n");
+	else {
+		file.valid = 1;
+		file.currentPointer = 0;
+		file.blocksSize = record->blocksFileSize;
+		file.bytesSize = record->bytesFileSize;
+		file.MFT = hasFile(name, fatherReg);
+		strcpy(file.name, record->name);
+	}	
+	return file;
 }
 
 OPENDIRECTORY getDir(DWORD fatherReg, char *name) {

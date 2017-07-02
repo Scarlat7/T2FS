@@ -57,13 +57,14 @@ int write2(FILE2 handle, char *buffer, int size){
 		}
 	}
 }
-*********************************************
+*/
 FILE2 create2 (char *filename){
 	char *name;
-	struct t2fs_record newRecord;
+	struct t2fs_record* newRecord = malloc(sizeof(struct t2fs_record));
 	DWORD mftDir;
+	FILE2 handle;
 
-	if((name = getFileName(filename) == NULL)
+	if((name = getFileName(filename)) == NULL)
 		return ERROR;
 	
 	if((mftDir = pathExists(filename, name)) <= 0)
@@ -72,14 +73,18 @@ FILE2 create2 (char *filename){
 	if((newRecord = createFile(name, 1)) == NULL)
 		return ERROR;
 
-	if(addRecord(mftDir, &newRecord))
+	if(addRecord(mftDir, newRecord))
 		return ERROR;
 
-	return openFile(filename);
+	if((handle = getHandle(1)) == ERROR)
+		return ERROR;
+
+	ctrl.openFilesArray[handle] = getFile(mftDir, name);
+	
+	return handle;
 	
 }
 
-*********************************************/
 int mkdir2 (char *pathname){
 	char *last = strrchr(pathname, '/');
 	char dirName[MAX_FILE_NAME_SIZE];
