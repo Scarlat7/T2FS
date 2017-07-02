@@ -6,8 +6,8 @@
 	t_control ctrl;
 
 int init_lib(){
-		
 	ctrl.N_OpenFiles = 0;
+	ctrl.N_OpenDirectories = 0;
 	read_boot_section();
 
 	return 0;

@@ -8,39 +8,45 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
+/******************************************
+	COMENTEI PRA NÃO ZOAR A COMPILAÇÃO
 void init_openFilesArray(){
 	int i = 0;
 	for(i = 0; i < N_OPENFILES; i++){
-		openFilesArray[i].MFT = -1;
+		openFilesArray[i] = -1;
 	}
 }
+*/
 
-int getFileNumber(){
+int getHandle(int type){
 	int i;	
-	for(i = 0; i < N_OPENFILES; i++){
-		if(openFilesArray[i].MFT == -1){
-			return i;		
-		}
+	switch(type) {
+		1: for(i = 0; i < N_OPENFILES; i++)
+			if(ctrl.openFilesArray[i].valid == -1) return i;
+			break;
+		2: for(i = 0; i < N_OPENDIRECTORIES; i++)
+			if(ctrl.openDirectoriesArray[i].valid == -1) return i;
+			break;
+		default: return -1;
 	}
-	printf("NUMERO DE ARQUIVOS ABERTOS EXCEDIDO\n"); 	
+	printf("NUMERO DE ARQUIVOS OU DIRETORIOS ABERTOS EXCEDIDO\n"); 	
 	return -1;
 }
 
-
+/*
 int openFile(char *path){
-	struct t2fs_record* fileRecord;
-	//if(isOpen(path)) return ERROR;
+	struct t2fs_records fileRecord;
+	if(isOpen(path)) return ERROR;
 		
 	OPENFILES newFile;
 	int fileNumber;
 
 	fileRecord = getRecordsFile(path);
 
-	newFile.MFT = fileRecord->MFTNumber;
+	newFile.MFT = fileRecord.MFTNumber;
 	newFile.currentPointer = 0;
-	strcpy(fileRecord->name, path);	
-	newFile.size = fileRecord->bytesFileSize;
+	strcpy(fileRecord.name, path);	
+	newFile.size = fileRecord.bytesFileSize;
 
 	if((fileNumber = getFileNumber())){
 		openFilesArray[fileNumber] = newFile;
@@ -49,73 +55,73 @@ int openFile(char *path){
 	else return ERROR;
 }
 
-struct t2fs_record* getRecordsFile(char *path){
+struct t2fs_records getRecordsFile(char *path){
 	char *directorie;
-	struct t2fs_record* actualRecord = malloc(sizeof(struct t2fs_record));
-	BYTE *sectors;
-	sectors = (BYTE*)malloc(ctrl.boot.blockSize*SECTOR_SIZE);
+	struct t2fs_records actualRecord;
+	BYTE sectors = malloc(sectorsInBlock*SECTOR_SIZE);
 	int i, j;
-	DWORD rootBlocks = getFileBlockSize(1);
-	DWORD currentLB, initial_sector;
+	DWORD rootBlocks = getRootBlocks();
+	DWORD currentLB;
 	
 	directorie = strtok(path, "/");	
 	for(i = 0; i < rootBlocks; i++){
-		mapVBN(1, i, &currentLB);
-		if(mapLBN(currentLB, &initial_sector) == ERROR)
-			return NULL;
-
-		for(j = 0; j < ctrl.boot.blockSize; j++){		
+		currentLB = mapVBN(1, i);
+		initial_sector = blockToSector(currentLB);
+		for(j = 0; j < sectorsInBlock; j++){		
 			read_sector(initial_sector+j, sectors);
 			sectors+=SECTOR_SIZE;
 		}
 		
-		if((actualRecord = getRecordByName(directorie, sectors)) != NULL)
+		if(actualRecord = getRecordByName(directorie, sectors))
 			break;
 	}
-
-	if(actualRecord->TypeVal == 1)
+	if(actualRecord.TypeVal == 1)
 		return actualRecord;
 	 
-	while((directorie = strtok(NULL, "/"))){
-		for(i = 0; i < actualRecord->blocksFileSize; i++){
-			mapVBN(actualRecord->MFTNumber,i, &currentLB);
-			if(mapLBN(currentLB, &initial_sector) == ERROR)
-				return NULL;
-			for(j = 0; j < ctrl.boot.blockSize; j++){
+	while((directorie = strtok(NULL, "/")){
+		for(i = 0; i < actualRecord.blocksFileSize; i++){
+			currentLB = mapVBN(actualRecord.MFTNumber,i);
+			initial_sector = blockToSector(currentLB);
+			for(j = 0; j < sectorsInBlock; j++){
 				read_sector(initial_sector+j, sectors);
 				sectors+=SECTOR_SIZE;
 			}
-			if((actualRecord = getRecordByName(directorie, sectors)) != NULL)
+			if(actualRecord = getRecordByName(directorie, sectors))
 				break;
 		}
-		if(actualRecord->TypeVal == 1)
+		if(actualRecord.TypeVal == 1)
 			return actualRecord;
 	}
-	return NULL;
+	return ERROR;
 }
 
-struct t2fs_record* getRecordByName(char *name, BYTE *sectors){
-	int RECORD_SIZE = sizeof(struct t2fs_record);	
+struct t2fs_records getRecordByName(char *name, BYTE *sectors){
+	int RECORD_SIZE = sizeof(struct t2fs_records);	
 	int N_RECORDS = SECTOR_SIZE/RECORD_SIZE;
-	struct t2fs_record* actual_record = malloc(sizeof(struct t2fs_record));
+	struct t2fs_records actual_record;
 	int i;
 	for(i = 0; i < N_RECORDS; i++){
-		memcpy(actual_record, sectors+RECORD_SIZE*i, RECORD_SIZE);
-		if(strcmp(actual_record->name, name) == 0)
+		memcpy(&actual_record, sectors+RECORD_SIZE*i, RECORD_SIZE)
+		if(strcmp(actual_record.name, name) == 0)
 			return actual_record; 
 	}
 	return NULL;
 }
-
+*****************************************************/
 char* getFileName(char *filename){
 	char *ptr;
-	if((ptr = strrchr(filename, '/')))
+	ptr = strrchr(filename, '/');
+	if(ptr)
 		return ptr+1;
 	else return NULL;
 }
 
-struct t2fs_record* createFile(char* name, short int typeVal){
-	struct t2fs_record* newRecord = malloc(sizeof(struct t2fs_record));
+
+/************************************************************
+** Tá dando muito erro, tio
+** Vou comentar pra compilar
+struct t2fs_record createFile(char* name, short int typeVal){
+	struct t2fs_record newRecord;
 	DWORD newMFT, LBN;
 
 	if((newMFT = findMFT()) <= 0)
@@ -124,16 +130,15 @@ struct t2fs_record* createFile(char* name, short int typeVal){
 	if(mapVBN(newMFT, 0, &LBN) < 0)
 		return NULL;
 
-	newRecord->TypeVal = typeVal;
-	strcpy(newRecord->name, name);
-	newRecord->blocksFileSize = 1;
-	newRecord->bytesFileSize = ctrl.boot.blockSize*SECTOR_SIZE;
-	newRecord->MFTNumber = newMFT;	
+	newRecord.TypeVal = typeVal;
+	strcpy(newRecord.name, name);
+	newRecord.blocksFileSize = 1;
+	newRecord.bytesFileSize = ctrl.boot.blockSize*SECTOR_SIZE;
+	newRecord.MFTNumber = newMFT;	
 	
 	return newRecord;
 }
-
-
+******************************************************************/
 
 int isValidName(char *name){
     char current;
@@ -145,51 +150,6 @@ int isValidName(char *name){
     }
     return 0;
 }
-
-/*
-int allocateBlock(struct t2fs_4tupla *vector){
-	DWORD block, newVBN;
-	int i = 0, found = 0;
-	struct t2fs_4tupla newTuplas[32];
-
-	block = searchBitmap2(0);
-	if(block == 0) return -1;
-	if(setBitmap2(block, 1);
-	do {
-		if(vector[i].atributeType == 0) {
-			if(i > 0) i--;
-			found = 1;
-		}
-		else i++;
-	}while(i < 32 && !found);
-
-	//Chegou ao fim da cadeia de tuplas
-	if(!found) {
-		//Tem bloco contíguo
-		if(vector[31].logicalBlockNumber + vector[31].numberOfContiguosBlocks == block){
-			vector[31].numberOfContiguosBlocks ++;
-			return 0;
-		}
-		
-		//Não tem bloco contíguo (aloca um novo registro)
-		newVBN = vector[i-1].virtualBlockNumber + vector[i-1].numberOfContiguosBlocks;
-		//newTupla(vector, newVBN); //Natáaaaaaalia! Preciso que tu faça essa, pfv
-		return 0;
-	}
-
-	//Achou o fim da tupla
-	//Tem bloco contíguo
-	if(vector[i].logicalBlockNumber + vector[i].numberOfContiguosBlocks == block){
-		vector[i].numberOfContiguosBlocks ++;
-		return 0;
-	}
-	//Não tem bloco contíguo
-	newVBN = vector[i].virtualBlockNumber + vector[i].numberOfContiguosBlocks;
-	//newTupla(vector, newVBN);
-	return 0;	
-}
-*/
-
 
 int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 	int j, i, desloc, lastFound = 0;
@@ -239,11 +199,16 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 	if(write_sector(sector + desloc, (unsigned char*)recSec)) return -1;
 	return 0;
 }
+
+int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
+	return -1;
+}
+
 void printRecords(DWORD reg){
 	int i, j, k;
 	struct t2fs_4tupla tuplas[32];
 	struct t2fs_record records[ctrl.boot.blockSize*4];
-
+	if(reg == -1) return;
 	do {
 		i = 0;
 		searchMFT(reg, tuplas); 
@@ -312,6 +277,7 @@ DWORD pathExists(char *pathName, char *fileName) {
 	strcpy(path, pathName);
 	char *directories = strtok(path, "/");
 	DWORD reg = 1, i;
+	//Verifica se o path até a pasta pai existe
 	while(directories && strcmp(directories, fileName)){
 		i = hasFile(directories, reg);
 		reg = i;
@@ -319,50 +285,19 @@ DWORD pathExists(char *pathName, char *fileName) {
 	}
 	return reg;
 }
-/*
-//Função que imprime o conteúdo de um diretório, dado seu setor e tamanho em bytes
-//Ainda não testada
-int printDirectory(unsigned int sector, DWORD bytesFileSize){
-    	unsigned char buffer[SECTOR_SIZE];
-	int index = 0;
-	int numberOfRegisters, numberOfSectors;
-    	t2fs_record current;
 
-	current = malloc(sizeof(t2fs_record));
-
-	
-	if(ctrl == NULL){
-        	init_lib();
-        	return -1;
+int isOpen(char *pathname, int type){
+	int i;
+	char *name = getFileName(pathname);
+	switch(type) {
+		1: for(i=0; i < N_OPENFILES; i++)
+			if(strcmp(ctrl.openFilesArray[i].name, name) == 0) return 1;
+			break;
+		2: for(i=0; i < N_OPENDIRECTORIES; i++)
+			if(strcmp(ctrl.openDirectoriesArray[i].name, name) == 0) return 1;
+			break;
+		default: return -1;
 	}
-
-    	numberOfRegisters = bytesFileSize/64; //Diretórios são sempre múltiplos de 64, logo arredondamento não é necessário.
-    numberOfSectors = numberOfRegisters/4;
-    if(numberOfRegisters%4 != 0) numberOfSectors++;
-
-    do {
-        if(read_sector(0, buffer) != 0){
-            fprintf(stderr, "Falha ao ler setor do disco.\n");
-            return -1;
-        }
-
-        do {
-            memcpy(&current.TypeVal, buffer+index, sizeof(BYTE));
-            index += sizeof(BYTE);
-            memcpy(&current.name, buffer+index, MAX_FILE_NAME_SIZE*sizeof(char));
-            index += MAX_FILE_NAME_SIZE*sizeof(char);
-            memcpy(&current.blocksFileSize, buffer+index, sizeof(DWORD));
-            index += sizeof(DWORD);
-            memcpy(&current.bytesFileSize, buffer+index, sizeof(DWORD));
-            index += sizeof(DWORD);
-            memcpy(&current.MFTNumber, buffer+index, sizeof(DWORD));
-            index += sizeof(DWORD);
-            printf("Type: %02x\tName: %s\n", current.TypeVal, current.name);
-            printf("BlocksFileSize: %4d\tBytesFileSize: %4d\tMFTNumber: %10d\n", current.blocksFileSize, current.bytesFileSize, current.MFTNumber);
-            numberOfRegisters --;
-        }while(numberOfRegisters != 0 && (numberOfRegisters+1)%4 != 0);
-        numberOfSectors --;
-    }while(numberOfSectors != 0);
-    return 0;
+	return 0;
 }
-*/
+

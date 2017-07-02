@@ -10,14 +10,37 @@
 #include "t2fs.h"
 
 #define ERROR -1
+#define N_OPENFILES 20
+#define N_OPENDIRECTORIES 50
 
 /** Control struct for library data static data */
+
+typedef struct openFiles{
+	int valid;
+	DWORD MFT;
+	DWORD currentPointer;
+	DWORD size;
+	char name[MAX_FILE_NAME_SIZE];
+	char sectorBuffer[SECTOR_SIZE];
+
+}OPENFILES;
+
+typedef struct openDirectories{
+	int valid;
+	DWORD MFT;
+	DWORD currentPointer;
+	DWORD size;
+	char name[MAX_FILE_NAME_SIZE];
+
+}OPENDIRECTORIES;
+
 typedef struct s_Control {
 	
 	struct t2fs_bootBlock boot;
-	//struct TDAA OpenFilesArray (struct TDAA should have fileBytesSize, dirty bit, MFT, currentPointer
-	//struct TDAA OpenDirectoriesArray/List	 (Directory should have MFT, dirty bit, fileBytesSize, currentEntry)
+	OPENFILES openFilesArray[N_OPENFILES];
+	OPENDIRECTORIES openDirectoriesArray[N_OPENDIRECTORIES];
 	int N_OpenFiles;
+	int N_OpenDirectories;
 
 } t_control;
 

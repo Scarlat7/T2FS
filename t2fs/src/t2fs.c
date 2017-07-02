@@ -1,4 +1,4 @@
-﻿#include "FilesController.h"
+#include "FilesController.h"
 #include "TuplesController.h"
 #include "BootController.h"
 #include "t2fs.h"
@@ -59,13 +59,13 @@ int write2(FILE2 handle, char *buffer, int size){
 		}
 	}
 }
-*********************************************/
+*********************************************
 FILE2 create2 (char *filename){
 	char *name;
-	struct t2fs_record *newRecord = malloc(sizeof(struct t2fs_record));
+	struct t2fs_record newRecord;
 	DWORD mftDir;
 
-	if((name = getFileName(filename)) == NULL)
+	if((name = getFileName(filename) == NULL)
 		return ERROR;
 	
 	if((mftDir = pathExists(filename, name)) <= 0)
@@ -74,12 +74,14 @@ FILE2 create2 (char *filename){
 	if((newRecord = createFile(name, 1)) == NULL)
 		return ERROR;
 
-	if(addRecord(mftDir, newRecord))
+	if(addRecord(mftDir, &newRecord))
 		return ERROR;
 
 	return openFile(filename);
 	
 }
+
+*********************************************/
 int mkdir2 (char *pathname){
 	char *last = strrchr(pathname, '/');
 	char dirName[MAX_FILE_NAME_SIZE];
@@ -92,9 +94,9 @@ int mkdir2 (char *pathname){
 	
 	//Procura pelo pai
 	fatherReg = pathExists(pathname, dirName);
-
-	//Verifica se já há uma pasta com esse nome
+	//Se a pasta já existe, retorna erro
 	if(hasFile(dirName, fatherReg) != -1) return -1;
+
 	if(fatherReg > 0) {
 		newReg = findMFT();
 		if(newReg <= 0) return -1;
@@ -115,4 +117,38 @@ int mkdir2 (char *pathname){
 		return 0;
 	}
 	return -1;
+}
+
+int rmdir2 (char *pathname){
+	char *last = strrchr(pathname, '/');
+	char dirName[MAX_FILE_NAME_SIZE];
+	DWORD  fatherReg, dirReg;
+	struct t2fs_record record;
+
+	//Pega última palavra
+	if(last == NULL) return -1;
+	strcpy(dirName, last+1);
+	
+	//Procura pelo pai
+	fatherReg = pathExists(pathname, dirName);
+	dirReg = hasFile(dirName, fatherReg);
+	//Se a pasta não existe, retorna erro
+	if(dirReg <= 0) return -1;
+
+	if(fatherReg > 0) {
+		//Verifica se está vazio
+		//Pega o record
+		//Reduz blockSize do pai
+		//Invalida no disco		
+	}
+	return -1;
+}
+
+DIR2 opendir2 (char *pathname) {
+	int newHandle;
+	if(isOpen(pathName, 2)) return -1; //Working
+	newHandle = getHandle(2);
+	if(newHandle == -1) return -1;
+	ctrl.openDirectoriesArray[newHandle] = getDir(pathname);
+	return newHandle;
 }
