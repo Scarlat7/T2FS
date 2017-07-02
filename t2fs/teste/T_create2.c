@@ -15,5 +15,10 @@ int main(){
 	printf("%d\n", handle);
 	printf("********************************************\n");
 
+	if((handle = create2("/oioi.mori:")) == ERROR) printf("Incapaz de criar /Test\n");
+	printf("********************************************\n");
+	printf("%d\n", handle);
+	printf("********************************************\n");
+
 	return 0;
 }
