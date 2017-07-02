@@ -43,54 +43,78 @@ int openFile(char *path){
 	else return ERROR;
 }
 
-struct t2fs_records getRecordsFile(char *path){
+struct t2fs_record* getRecordsFile(char *path){
 	char *directorie;
-	struct t2fs_records actualRecord;
-	BYTE sectors = malloc(sectorsInBlock*SECTOR_SIZE);
+	char *dummy = malloc(sizeof(path));
+	struct t2fs_record* actualRecord = malloc(sizeof(struct t2fs_record));
+	BYTE *sectors;
+	sectors = (BYTE*)malloc(ctrl.boot.blockSize*SECTOR_SIZE);
 	int i, j;
-	DWORD rootBlocks = getRootBlocks();
-	DWORD currentLB;
-	
-	directorie = strtok(path, "/");	
+	strcpy(dummy, path);
+	DWORD rootBlocks = getFileBlockSize(1);
+	DWORD currentLB, initial_sector;
+	puts("b");
+	printf("RB: %d\n", rootBlocks);
+	directorie = strtok(dummy, "/");
+	printf("%d", registerToSector(12));
 	for(i = 0; i < rootBlocks; i++){
-		currentLB = mapVBN(1, i);
-		initial_sector = blockToSector(currentLB);
-		for(j = 0; j < sectorsInBlock; j++){		
-			read_sector(initial_sector+j, sectors);
-			sectors+=SECTOR_SIZE;
+		puts("a");
+		mapVBN(1, i, &currentLB);
+		printf("LB: %d\n", currentLB);
+		//if(mapLBN(currentLB, &initial_sector) == ERROR)
+		//	return NULL;
+		
+		initial_sector = currentLB*ctrl.boot.blockSize;
+		printf("IS: %d\n", initial_sector);
+		
+		for(j = 0; j < ctrl.boot.blockSize; j++){		
+			read_sector(initial_sector+j, sectors+SECTOR_SIZE*j);
 		}
 		
-		if(actualRecord = getRecordByName(directorie, sectors))
+		puts("c");
+
+		if((actualRecord = getRecordByName(directorie, sectors)) != NULL)
 			break;
 	}
-	if(actualRecord.TypeVal == 1)
+	
+	if(actualRecord == NULL)	
+		return NULL;
+
+	if(actualRecord->TypeVal == 1)
 		return actualRecord;
-	 
-	while((directorie = strtok(NULL, "/")){
-		for(i = 0; i < actualRecord.blocksFileSize; i++){
-			currentLB = mapVBN(actualRecord.MFTNumber,i);
-			initial_sector = blockToSector(currentLB);
-			for(j = 0; j < sectorsInBlock; j++){
-				read_sector(initial_sector+j, sectors);
-				sectors+=SECTOR_SIZE;
+	puts("e");
+	while((directorie = strtok(NULL, "/"))){
+		for(i = 0; i < actualRecord->blocksFileSize; i++){
+			mapVBN(actualRecord->MFTNumber,i, &currentLB);
+
+			initial_sector = currentLB*ctrl.boot.blockSize;
+
+			for(j = 0; j < ctrl.boot.blockSize; j++){
+				read_sector(initial_sector+j, sectors+SECTOR_SIZE*j);
 			}
-			if(actualRecord = getRecordByName(directorie, sectors))
+			puts("g");
+			if((actualRecord = getRecordByName(directorie, sectors)) != NULL)
 				break;
 		}
-		if(actualRecord.TypeVal == 1)
+		if(actualRecord->TypeVal == 1)
 			return actualRecord;
 	}
-	return ERROR;
+	return NULL;
 }
 
-struct t2fs_records getRecordByName(char *name, BYTE *sectors){
-	int RECORD_SIZE = sizeof(struct t2fs_records);	
+struct t2fs_record* getRecordByName(char *name, BYTE *sectors){
+	int RECORD_SIZE = sizeof(struct t2fs_record);	
 	int N_RECORDS = SECTOR_SIZE/RECORD_SIZE;
-	struct t2fs_records actual_record;
 	int i;
+	for(i = 0; i < sizeof(sectors); i++){
+		printf("%c", *(sectors+i));
+	}
+	struct t2fs_record* actual_record = malloc(RECORD_SIZE);
+	
 	for(i = 0; i < N_RECORDS; i++){
-		memcpy(&actual_record, sectors+RECORD_SIZE*i, RECORD_SIZE)
-		if(strcmp(actual_record.name, name) == 0)
+		memcpy(actual_record, sectors+RECORD_SIZE*i, RECORD_SIZE);
+		puts(actual_record->name);
+		if(strcmp(actual_record->name, name) == 0)
 			return actual_record; 
 	}
 	return NULL;
@@ -106,10 +130,8 @@ char* getFileName(char *filename){
 
 
 /************************************************************
-** Tá dando muito erro, tio
-** Vou comentar pra compilar
-struct t2fs_record createFile(char* name, short int typeVal){
-	struct t2fs_record newRecord;
+struct t2fs_record* createFile(char* name, short int typeVal){
+	struct t2fs_record* newRecord = malloc(sizeof(struct t2fs_record));
 	DWORD newMFT, LBN;
 
 	if((newMFT = findMFT()) <= 0)
@@ -118,11 +140,11 @@ struct t2fs_record createFile(char* name, short int typeVal){
 	if(mapVBN(newMFT, 0, &LBN) < 0)
 		return NULL;
 
-	newRecord.TypeVal = typeVal;
-	strcpy(newRecord.name, name);
-	newRecord.blocksFileSize = 1;
-	newRecord.bytesFileSize = ctrl.boot.blockSize*SECTOR_SIZE;
-	newRecord.MFTNumber = newMFT;	
+	newRecord->TypeVal = typeVal;
+	strcpy(newRecord->name, name);
+	newRecord->blocksFileSize = 1;
+	newRecord->bytesFileSize = ctrl.boot.blockSize*SECTOR_SIZE;
+	newRecord->MFTNumber = newMFT;	
 	
 	return newRecord;
 }
