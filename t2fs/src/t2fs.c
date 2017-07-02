@@ -88,8 +88,9 @@ FILE2 create2 (char *filename){
 }
 
 int mkdir2 (char *pathname){
+	int i;
 	char *last = strrchr(pathname, '/');
-	char dirName[MAX_FILE_NAME_SIZE];
+	char dirName[strlen(last+1)];
 	struct t2fs_record newRecord;
 	DWORD  fatherReg, newReg, LBN;
 
@@ -111,6 +112,10 @@ int mkdir2 (char *pathname){
 		//Cria novo record
 		newRecord.TypeVal = 2;
 		strcpy(newRecord.name, dirName);
+
+		//Vocês estão prontas para a gambiarra, crianças?
+		for(i=strlen(dirName); i<MAX_FILE_NAME_SIZE; i++) newRecord.name[i]='\0';
+
 		newRecord.blocksFileSize = 1;
 		newRecord.bytesFileSize = ctrl.boot.blockSize*SECTOR_SIZE;
 		newRecord.MFTNumber = newReg;

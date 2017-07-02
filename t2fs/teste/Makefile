@@ -21,6 +21,7 @@ VBN=mapVBN
 MKDIR=mkdir
 ADD=addRecord
 OPDIR=opendir
+MAIN=main
 
 all: T_$(INIT) T_$(READBOOT) T_$(VALIDNAME) T_$(SEARCHMFT) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(OPDIR)
 
@@ -56,6 +57,9 @@ T_$(OPDIR): T_$(OPDIR).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BI
 
 T_$(ADD): T_$(ADD).c $(BIN_DIR)/FilesController.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/TuplesController.o
 	$(CC) -o T_$(ADD) T_$(ADD).c -I$(INC_DIR)/ $(BIN_DIR)/FilesController.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/TuplesController.o $(CFLAGS)
+
+$(MAIN): $(MAIN).c $(BIN_DIR)/bitmap2.o $(BIN_DIR)/apidisk.o
+	$(CC) -o $(MAIN) $(MAIN).c -I$(INC_DIR)/ $(BIN_DIR)/bitmap2.o $(BIN_DIR)/apidisk.o $(CFLAGS)
 
 clean:
 	rm -rf *.o *~ T_$(INIT) T_$(READBOOT) T_$(SEARCHMFT) T_$(VALIDNAME) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(OPDIR)
