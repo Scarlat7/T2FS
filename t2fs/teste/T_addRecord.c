@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "FilesController.h"
-#include "BootController.h"
 
 int main() {
 	struct t2fs_record r[17]; //deve mudar de setor e bloco

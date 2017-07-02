@@ -11,10 +11,12 @@
 t_control ctrl;
 
 int mapLBN(DWORD LBN, DWORD* sector){
-	DWORD base;
-	base = (1 + ctrl.boot.MFTBlocksSize)*ctrl.boot.blockSize;
-	*sector = base + LBN * ctrl.boot.blockSize;
-	if(*sector > ctrl.boot.diskSectorSize) return -1;
+	//DWORD base;
+	//base = (1 + ctrl.boot.MFTBlocksSize)*ctrl.boot.blockSize;
+	//*sector = base + LBN * ctrl.boot.blockSize;
+	*sector = LBN*ctrl.boot.blockSize;
+	//if(*sector > ctrl.boot.diskSectorSize) return -1;
+	if(*sector >= ctrl.boot.diskSectorSize) return -1;
 	return 0;
 }
 

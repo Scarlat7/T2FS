@@ -60,7 +60,7 @@ int write2(FILE2 handle, char *buffer, int size){
 */
 FILE2 create2 (char *filename){
 	char *name;
-	struct t2fs_record* newRecord = malloc(sizeof(struct t2fs_record));
+	struct t2fs_record* newRecord; // Tirei isso porque já tem malloc dentro da fnção createFile = malloc(sizeof(struct t2fs_record));
 	DWORD mftDir;
 	FILE2 handle;
 
@@ -75,6 +75,8 @@ FILE2 create2 (char *filename){
 
 	if(addRecord(mftDir, newRecord))
 		return ERROR;
+	
+	free(newRecord);
 
 	if((handle = getHandle(1)) == ERROR)
 		return ERROR;

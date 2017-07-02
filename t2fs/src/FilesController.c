@@ -216,7 +216,9 @@ int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
 struct t2fs_record * findRecord(DWORD reg, char *name) {
 	int i, j, k;
 	struct t2fs_4tupla tuplas[32];
-	struct t2fs_record records[ctrl.boot.blockSize*4];
+	//struct t2fs_record records[ctrl.boot.blockSize*4];
+	struct t2fs_record *records = malloc(ctrl.boot.blockSize*4);
+
 	if(reg == -1) return NULL;
 	do {
 		i = 0;
@@ -342,7 +344,8 @@ OPENFILE getFile(DWORD fatherReg, char *name){
 		file.blocksSize = record->blocksFileSize;
 		file.bytesSize = record->bytesFileSize;
 		file.MFT = hasFile(name, fatherReg);
-		strcpy(file.name, record->name);
+			strcpy(file.name, record->name);
+		free(record); //MODIFICADO NATÁLIA
 	}	
 	return file;
 }
