@@ -93,8 +93,9 @@ int write2(FILE2 handle, char *buffer, int size){
 	escrita = malloc(n_sectors*SECTOR_SIZE);
 	int remaining = n_sectors;
 
+	if(readRequestedSectors(handle, size, escrita, n_sectors) == ERROR) return ERROR;
 
-	for(i = 0; i < n_blocks-end_pointer; i++){
+	/*for(i = 0; i < n_blocks-end_pointer; i++){
 		mapVBN(mft, i+end_pointer, &currentLB);
 		mapLBN(currentLB, &initial_sector);
 		for(j = 0; j < (ctrl.boot.blockSize - offset); j++){
@@ -103,7 +104,7 @@ int write2(FILE2 handle, char *buffer, int size){
 			if(remaining == 0) break;
 		}
 		if(remaining == 0) break;
-	}
+	}*/
 
 	memcpy(escrita+relativeByte, buffer, size);
 

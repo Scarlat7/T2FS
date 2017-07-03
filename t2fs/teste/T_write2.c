@@ -9,7 +9,7 @@ int main(){
 	//init_openFilesArray();
 	int handle;
 	char teste[12];
-	strcpy(teste, "/natmoriiii");
+	strcpy(teste, "/natMoriiii");
 
 	if((handle = create2(teste)) == ERROR){
 		printf("Incapaz de criar /Test\n");
