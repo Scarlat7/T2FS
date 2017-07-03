@@ -17,6 +17,10 @@
 #define TUPLES_IN_REG 32
 #define SECTORS_IN_REG 2
 
+/* Deletes a MFT register from disk 
+** (ONLY THE REGISTER, THE MAPPED BLOCKS ARE NOT DELETED) */
+int deleteRegister(DWORD MFT);
+
 /* Maps the program Virtual Block Number (VBN) to a disk Logical Block Number
 ** (LBN)
 ** Main author: NATÁLIA GUBIANI RAMPON - 00262502

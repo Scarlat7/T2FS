@@ -29,8 +29,9 @@ READD=readdir2
 SEEK=seek2
 READ=read2
 CLOSED=closedir2
+DELR=deleteRegister
 
-all: T_$(INIT) T_$(READBOOT) T_$(VALIDNAME) T_$(SEARCHMFT) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(OPDIR) T_$(CREATE) T_$(WRITE) T_$(OPEN) T_$(READD) T_$(SEEK) T_$(READ) T_$(CLOSED)
+all: T_$(INIT) T_$(READBOOT) T_$(VALIDNAME) T_$(SEARCHMFT) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(OPDIR) T_$(CREATE) T_$(WRITE) T_$(OPEN) T_$(READD) T_$(SEEK) T_$(READ) T_$(CLOSED) T_$(DELR)
 
 T_$(INIT): T_$(INIT).c $(BIN_DIR)/BootController.o $(BIN_DIR)/apidisk.o
 	$(CC) -o T_$(INIT) T_$(INIT).c -I$(INC_DIR)/ $(BIN_DIR)/BootController.o $(BIN_DIR)/apidisk.o $(CFLAGS)
@@ -89,5 +90,8 @@ T_$(SEEK): T_$(SEEK).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_
 T_$(READ): T_$(READ).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
 	$(CC) -o T_$(READ) T_$(READ).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
 
+T_$(DELR): T_$(DELR).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
+	$(CC) -o T_$(DELR) T_$(DELR).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+
 clean:
-	rm -rf *.o *~ T_$(INIT) T_$(READBOOT) T_$(SEARCHMFT) T_$(VALIDNAME) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(OPDIR) T_$(CREATE) T_$(WRITE) T_$(OPEN) T_$(READD) T_$(SEEK) T_$(READ) T_$(CLOSED)
+	rm -rf *.o *~ T_$(INIT) T_$(READBOOT) T_$(SEARCHMFT) T_$(VALIDNAME) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(OPDIR) T_$(CREATE) T_$(WRITE) T_$(OPEN) T_$(READD) T_$(SEEK) T_$(READ) T_$(CLOSED) T_$(DELR)

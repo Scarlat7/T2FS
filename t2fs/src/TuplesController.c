@@ -10,6 +10,22 @@
 
 t_control ctrl;
 
+int deleteRegister(DWORD MFT){
+
+	struct t2fs_4tupla t[TUPLES_IN_REG];
+	DWORD currentMFT = MFT;
+
+	do{
+		if(searchMFT(currentMFT, t) == ERROR) return ERROR;
+		t[0].atributeType = INVALID_PTR;
+		write_sector(registerToSector(currentMFT), (BYTE*)t);
+		printf("sector %d\n", registerToSector(currentMFT));
+		currentMFT = t[TUPLES_IN_REG-1].virtualBlockNumber;
+	}while(t[TUPLES_IN_REG-1].atributeType == MFT_ADICIONAL);
+
+	return 0;
+}
+
 int mapLBN(DWORD LBN, DWORD* sector){
 	//DWORD base;
 	//base = (1 + ctrl.boot.MFTBlocksSize)*ctrl.boot.blockSize;
@@ -26,105 +42,6 @@ int searchMFT(DWORD numReg, struct t2fs_4tupla *vector) {
 	
 	return 0;
 }
-
-/*
-int readSectorFile(FILE2 fileHandle, int nSectors, BYTE* buffer) {
-	
-	DWORD sector, currentMFT;
-	DWORD startVirtualBlock, block;
-	int k, offset;
-	int remaining = 0;
-	int index = 0;
-	BYTE bufferS[SECTOR_SIZE];
-	t2fs_4tupla bufferT[TUPLES_IN_REG];
-	DWORD LBN;
-
-	currentMFT = ctrl.OpenFilesArray[fileHandle].MFT;
-
-	searchMFT(curentMFT, bufferT);
-	
-	startVirtualBlock = ctrl.OpenFilesArray[fileHandle].currentPointer/ctrl.boot.blockSize;	
-	
-	offset = (ctrl.OpenFilesArray[fileHandle].currentPointer%ctrl.boot.blockSize)/SECTOR_SIZE;	
-	
-	if(ctrl.OpenFilesArray[fileHandle].size/SECTOR_SIZE+1 < offset + nSectors){
-		fprintf(stderr,"Numero de setores requisitados eh maior do que o arquivo.\n");
-		return ERROR;
-	}
-
-	k = 0;
-
-	while(remaining != nSectors){
-
-		if(mapVBN(currentMFT, startVirtualBlock+k, &LBN) != 0){
-			return ERROR;
-		}			
-	
-		mapLBN(LBN, &sector);
-				
-		//percorre até o fim desse bloco
-		while(sector%ctrl.boot.blockSize != 0 && remaining != nSector){	
-			//primeiro bloco pode ter apenas uma parte
-			if(!remaining){
-				sector +=  offset;
-			}else sector++;
-			if(read_sector(sector, buffer+index) != 0)
-				return ERROR;
-			remaining++;
-			index+=SECTOR_SIZE;
-		}
-		k++;
-	}
-
-	return 0;
-
-lllllllllllllllllllll
-		//loop de leitura do buffer de tuplas de um setor
-		while(i < TUPLES_IN_REG && remaining != nSectors){
-			if(bufferT[i].atributeType == MAPEAMENTO){
-				if(isInRange(startVirtualBlock, bufferT[i])){
-					k = startVirtualBlock - bufferT[i].virtualBlockNumber;
-					while(remaining != nSectors && k < numberOfContiguousBlocks){
-						block = bufferT[i].logicalBlockNumber + k;
-						sector = block*ctrl.blockSize;
-						while(sector%blockSize != 0 && remaining != nSectors){
-							if(!remaining) 
-								sector += (ctrl.OpenFilesArray[fileHandle].currentPointer%blockSize)/SECTOR_SIZE;
-							else	sector++;
-							//read_sector(sector, bufferS);
-							read_sector(sector, buffer+index);
-							remaining++;
-							//memcpy(buffer+index, bufferS, SECTOR_SIZE);
-							index += SECTOR_SIZE;
-						}
-						k++;
-					}
-
-				}
-				i++;
-			}else if(bufferT[i-1].attributeType == FIM_ENCADEAMENTO){
-				if(remaining != nSectors ){
-					fprintf(stderr, "Numero de setores requisitados inexistentes no arquivo.\n");
-					return -1;
-				}
-			}
-		}
-	
-		if(bufferT[i-1].attributeType == MFT_ADICIONAL){
-			currentMFT = bufferT[i-1].virtualBlockNumber;
-			j = 0;
-		}else{
-			j+=1;
-		}
-
-		if(bufferT[i-1].attributeType == FIM_ENCADEAMENTO){
-			if(remaining != nSectors ){
-				fprintf(stderr, "Numero de setores requisitados inexistentes no arquivo.\n");
-				return -1;
-			}
-		}
-
-} */
  
 int registerToSector(DWORD MFT){
 
@@ -306,7 +223,6 @@ int getFileBlockSize(DWORD MFT){
 		searchMFT(currentMFT,buffer);
 		i = 0;
 		while(i < TUPLES_IN_REG){
-	
 			if(buffer[i].atributeType == MAPEAMENTO){
 				counter+=buffer[i].numberOfContiguosBlocks;
 			}
@@ -320,8 +236,9 @@ int getFileBlockSize(DWORD MFT){
 		}
 
 		if(buffer[i-1].atributeType == MFT_ADICIONAL){
-			currentMFT = buffer[i].virtualBlockNumber;
+			currentMFT = buffer[i-1].virtualBlockNumber;
 		}
+		else return -1;
 	}while(1);
 
 	return -1;

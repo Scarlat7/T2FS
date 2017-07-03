@@ -56,7 +56,7 @@ int main(){
 		printf("\t\t\t\tReg 9, VBN %u, LBN %u\n", i, LBN);
 	}
 
-	printf("Registro 9 file size in blocks: %d\n\texpected 32\n,", getFileBlockSize(9));
+	printf("Registro 9 file size in blocks: %d\n\texpected 33\n,", getFileBlockSize(9));
 	printf("Registro 6 file size in blocks: %d\n\texpected 3\n,", getFileBlockSize(6));
 
 	return 0;
