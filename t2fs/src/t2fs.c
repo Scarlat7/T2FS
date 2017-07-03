@@ -82,6 +82,8 @@ FILE2 open2(char *filename){
 	DWORD mftDir;
 	FILE2 handle;
 
+	if(isOpen(filename, TYPEVAL_REGULAR)) return ERROR;
+
 	if((name = getFileName(filename)) == NULL)
 		return ERROR;
 

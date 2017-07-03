@@ -8,6 +8,7 @@ int main(){
 	printf("********************************************\n");
 	printf("%d\n", open2("/oi.a"));
 	printf("%d\n", open2("/oioi.mori:"));
+	printf("%d\n", open2("/oi.a"));
 	printf("********************************************\n");
 
 	return 0;
