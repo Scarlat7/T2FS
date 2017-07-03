@@ -79,7 +79,7 @@ int write2(FILE2 handle, char *buffer, int size){
 
 FILE2 create2 (char *filename){
 	char *name;
-	struct t2fs_record* newRecord; // Tirei isso porque já tem malloc dentro da fnção createFile = malloc(sizeof(struct t2fs_record));
+	struct t2fs_record* newRecord;
 	DWORD mftDir;
 	FILE2 handle;
 
@@ -109,46 +109,36 @@ FILE2 create2 (char *filename){
 	
 }
 
-int mkdir2 (char *pathname){
-	int i;
-	char *last = strrchr(pathname, '/');
-	char dirName[strlen(last+1)];
-	struct t2fs_record newRecord;
-	DWORD  fatherReg, newReg, LBN;
+DIR2 mkdir2 (char *pathname){
+	char *name;
+	struct t2fs_record* newRecord;
+	DWORD mftDir;
 
-	//Pega última palavra
-	if(last == NULL) return -1;
-	strcpy(dirName, last+1);
+	DIR2 handle;
+
+	if((name = getFileName(pathname)) == NULL)
+		return ERROR;
+		
+	if((mftDir = pathExists(pathname, name)) <= 0)
+		return ERROR;
+
+	if(hasFile(name, mftDir) != ERROR)
+		return ERROR;
+
+	if((newRecord = createFile(name, 2)) == NULL)
+		return ERROR;
+
+	if(addRecord(mftDir, newRecord))
+		return ERROR;
 	
-	//Procura pelo pai
-	fatherReg = pathExists(pathname, dirName);
-	//Se a pasta já existe, retorna erro
-	if(hasFile(dirName, fatherReg) != -1) return -1;
+	free(newRecord);
 
-	if(fatherReg > 0) {
-		newReg = findMFT();
-		if(newReg <= 0) return -1;
-		//Atualiza registro MFT recém criado
-		if(mapVBN(newReg, 0, &LBN)) return -1;
+	if((handle = getHandle(2)) == ERROR)
+		return ERROR;
 
-		//Cria novo record
-		newRecord.TypeVal = 2;
-		strcpy(newRecord.name, dirName);
-
-		//Vocês estão prontas para a gambiarra, crianças?
-		for(i=strlen(dirName); i<MAX_FILE_NAME_SIZE; i++) newRecord.name[i]='\0';
-
-		newRecord.blocksFileSize = 1;
-		newRecord.bytesFileSize = ctrl.boot.blockSize*SECTOR_SIZE;
-		newRecord.MFTNumber = newReg;
-
-		//Para fins de debug
-		printf("Name: %s\tType: %d\tBlocks: %d\tBytes:%d\tMFT: %d\n", newRecord.name, newRecord.TypeVal, newRecord.blocksFileSize, newRecord.bytesFileSize, newRecord.MFTNumber);
-
-		if(addRecord(fatherReg, &newRecord)) return -1;
-		return 0;
-	}
-	return -1;
+	ctrl.openDirectoriesArray[handle] = getDir(mftDir, name);
+	
+	return handle;
 }
 /***********************************************************
 int rmdir2 (char *pathname){
