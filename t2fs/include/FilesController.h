@@ -11,8 +11,13 @@
 #include "t2fs.h"
 #include "BootController.h"
 
+DWORD bytesToBlocks(DWORD bytes);
+
 /*retorna o nome do arquivo a partir do path*/
 char* getFileName(char *filename);
+
+
+DWORD updateFileSize(OPENFILE file, DWORD size);
 
 /*cria um registro mft pro novo arquivo e retorna seu record*/
 struct t2fs_record* createFile(char* name, short int typeVal);

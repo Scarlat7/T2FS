@@ -198,7 +198,7 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 	
 		//Achou o lugar onde deve começar a mapeamento do próximo
 		if(i < TUPLES_IN_REG && bufferT[i].atributeType == FIM_ENCADEAMENTO){
-			if(isSequential(VBN, bufferT[i-1])){
+			if(!isSequential(VBN, bufferT[i-1])){
 				fprintf(stderr,"Mapeamento requer bloco virtual nao contiguou ao ultimo mapeado.\n");
 				return -1;
 			}
@@ -337,14 +337,14 @@ int isContiguous(int bit, struct t2fs_4tupla t){
 int isSequential(DWORD VBN, struct t2fs_4tupla t){
 
 	if(VBN - (t.virtualBlockNumber + t.numberOfContiguosBlocks - 1) != 1){
-		return 1;
-	}else return 0;
+		return 0;
+	}else return 1;
 
 }
 
 int isInRange(DWORD VBN, struct t2fs_4tupla t){
 
-	if((t.virtualBlockNumber + t.numberOfContiguosBlocks-1) >= VBN && t.virtualBlockNumber >= VBN){
+	if((t.virtualBlockNumber + t.numberOfContiguosBlocks-1) >= VBN && t.virtualBlockNumber <= VBN){
 		return 1;
 	} else return 0;
 }

@@ -6,6 +6,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+DWORD bytesToBlocks(DWORD bytes){
+	DWORD BLOCK_SIZE = ctrl.boot.blockSize*SECTOR_SIZE;
+	return bytes/BLOCK_SIZE + (bytes%BLOCK_SIZE == 0 ? 0 : 1);
+
+}
+
 int getHandle(int type){
 	int i;	
 	switch(type) {
@@ -120,6 +126,15 @@ struct t2fs_record* getRecordByName(char *name, BYTE *sectors){
 	return NULL;
 }
 *****************************************************/
+DWORD updateFileSize(OPENFILE file, DWORD size){
+	int offset = file.currentPointer + size;
+
+	if(offset > file.bytesSize)
+		return offset - file.bytesSize;
+
+	return 0;
+}
+
 char* getFileName(char *filename){
 	char *ptr;
 	ptr = strrchr(filename, '/');
@@ -143,7 +158,7 @@ struct t2fs_record* createFile(char* name, short int typeVal){
 	newRecord->TypeVal = typeVal;
 	strcpy(newRecord->name, name);
 	newRecord->blocksFileSize = 1;
-	newRecord->bytesFileSize = ctrl.boot.blockSize*SECTOR_SIZE;
+	newRecord->bytesFileSize = 0;
 	newRecord->MFTNumber = newMFT;	
 	
 	return newRecord;
@@ -342,9 +357,8 @@ OPENFILE getFile(DWORD fatherReg, char *name){
 		file.currentPointer = 0;
 		file.blocksSize = record->blocksFileSize;
 		file.bytesSize = record->bytesFileSize;
-		file.MFT = hasFile(name, fatherReg);
-			strcpy(file.name, record->name);
-		free(record); //MODIFICADO NATÁLIA
+		file.MFT = record->MFTNumber;
+		strcpy(file.name, record->name);
 	}	
 	return file;
 }
