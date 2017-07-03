@@ -29,7 +29,7 @@ typedef struct openFile{
 typedef struct openDirectory{
 	int valid;
 	DWORD MFT;
-	DWORD currentPointer;
+	DWORD currentEntry;
 	DWORD blocksSize;
 	DWORD bytesSize;
 	char name[MAX_FILE_NAME_SIZE];

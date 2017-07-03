@@ -167,6 +167,7 @@ char* getRecordName(DWORD fatherReg, DWORD pos);
 ** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
 ** @RETURN:	struct record
 ** @ARGUMENTS: 	[IN - DWORD] reg - father register
-**		[IN - char*] name - name of the record
+**		[IN - char*] name - name of the record, if exists
+**		[IN - DWORD] entry - number of the entry, if exists
 */
-struct t2fs_record * findRecord(DWORD reg, char *name);
+struct t2fs_record * findRecord(DWORD reg, char *name, DWORD entry);

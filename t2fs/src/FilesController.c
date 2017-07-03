@@ -228,8 +228,8 @@ int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
 	return -1;
 }
 
-struct t2fs_record* findRecord(DWORD reg, char *name) {
-	int i, j, k;
+struct t2fs_record* findRecord(DWORD reg, char *name, DWORD entry) {
+	int i, j, k, l=0;
 	struct t2fs_4tupla tuplas[32];
 	struct t2fs_record *records = malloc(ctrl.boot.blockSize*4*sizeof(struct t2fs_record));
 
@@ -241,8 +241,11 @@ struct t2fs_record* findRecord(DWORD reg, char *name) {
 			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
 
 					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) return NULL;
-					for(k=0; k < ctrl.boot.blockSize*4; k++)
-						if(strcmp(records[k].name, name) == 0) return &records[k];
+					for(k=0; k < ctrl.boot.blockSize*4; k++){
+						if(entry == -1 && strcmp(records[k].name, name) == 0) return &records[k];
+						if(entry != -1 && l == entry) return &records[k];
+						if(records[k].TypeVal == 1 || records[k].TypeVal == 2) l++; //conta registros válidos
+					}
 			}			
 			i++;
 		}while(tuplas[i].atributeType == 1);
@@ -350,7 +353,7 @@ int isOpen(char *pathname, int type){
 
 OPENFILE getFile(DWORD fatherReg, char *name){
 	OPENFILE file;
-	struct t2fs_record *record = findRecord(fatherReg, name);
+	struct t2fs_record *record = findRecord(fatherReg, name, -1);
 	if(record == NULL) printf("Deu ruim no findRecord.\n");
 	else {
 		file.valid = 1;
@@ -365,11 +368,11 @@ OPENFILE getFile(DWORD fatherReg, char *name){
 
 OPENDIRECTORY getDir(DWORD fatherReg, char *name) {
 	OPENDIRECTORY dir;
-	struct t2fs_record *record = findRecord(fatherReg, name);
+	struct t2fs_record *record = findRecord(fatherReg, name, -1);
 	if(record == NULL) printf("Deu ruim no findRecord.\n");
 	else {
 		dir.valid = 1;
-		dir.currentPointer = 0;
+		dir.currentEntry = 0;
 		dir.blocksSize = record->blocksFileSize;
 		dir.bytesSize = record->bytesFileSize;
 		dir.MFT = hasFile(name, fatherReg);

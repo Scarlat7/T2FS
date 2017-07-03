@@ -203,22 +203,17 @@ DIR2 opendir2 (char *pathname) {
 	return newHandle;
 }
 
-/*************************************************************
 int readdir2 (DIR2 handle, DIRENT2 *dentry) {
-	char *recordName;
 	struct t2fs_record *record = malloc(sizeof(struct t2fs_record));
-	if(isOpenH(handle, 2) != 1) return -2;
-	//Busca pelo record apontado por reader.currentEntry
-	//Criar função que, com base no reader.currentEntry e no reader.MFT,
-	//retorna um nome válido para pesquisar via findRecord
-	recordName = getRecordName(ctrl.openDirectoriesArray[handle].MFT, ctrl.openDirectoriesArray[handle].currentEntry);
-	if(recordName == NULL) return -2; //Caso não exista
-	if(strcmp(recordName, "")) return -1;	//Caso tenha acabado
-	record = findRecord(ctrl.openDirectoriesArray[handle].MFT, recordName);
+
+	if(isOpenH(handle, 2) != 1) return -2; //Se não está aberto
+	record = findRecord(ctrl.openDirectoriesArray[handle].MFT, NULL, ctrl.openDirectoriesArray[handle].currentEntry);
+	if(record == NULL) return -1; //Se não há mais entradas
 	//Converter record -> dirent2
-	ctrl.openDirectoriesArray[handle].currentEntry ++;
+	strcpy(dentry->name, record->name);
+	dentry->fileType = record->TypeVal;
+	dentry->fileSize = record->bytesFileSize;
+	ctrl.openDirectoriesArray[handle].currentEntry++;
 	free(record);
 	return 0;
 }
-
-*************************************************************/
