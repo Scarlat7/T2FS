@@ -13,6 +13,10 @@
 
 #define END -1
 
+/* le n_sectors do arquivo a partir do currentPointer */
+int readRequestedSectors(FILE2 handle, int size, BYTE *leitura, DWORD n_sectors);
+
+/* dado um número de bytes, retorna seu correspondente em blocos ocupados */
 DWORD bytesToBlocks(DWORD bytes);
 
 /*retorna o nome do arquivo a partir do path*/

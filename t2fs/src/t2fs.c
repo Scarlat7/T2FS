@@ -24,9 +24,42 @@ int seek2 (FILE2 handle, DWORD offset){
 	return 0;
 }
 
-/********************************************
+
 int read2 (FILE2 handle, char *buffer, int size){
-	BYTE *bufferAux;
+	
+	BYTE *leitura;
+	DWORD relativeByte = ctrl.openFilesArray[handle].currentPointer % SECTOR_SIZE;
+	DWORD actualReadSize = size;
+
+	if(!isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR)) 
+		return ERROR;
+	if(ctrl.openFilesArray[handle].currentPointer + size > ctrl.openFilesArray[handle].bytesSize){
+		actualReadSize = ctrl.openFilesArray[handle].bytesSize - ctrl.openFilesArray[handle].currentPointer;
+	}
+
+	DWORD n_sectors = size/SECTOR_SIZE;
+	if(size%SECTOR_SIZE != 0)
+		n_sectors++;
+
+	leitura = malloc(n_sectors*SECTOR_SIZE);
+
+	if(readRequestedSectors(handle, actualReadSize, leitura, n_sectors) == ERROR) return ERROR;
+
+	/*for(i = 0; i < n_blocks-end_pointer; i++){
+		mapVBN(mft, i+end_pointer, &currentLB);
+		mapLBN(currentLB, &initial_sector);
+		for(j = 0; j < (ctrl.boot.blockSize - offset); j++){
+			read_sector(initial_sector+ offset+j, escrita+i*BLOCK_SIZE+j*SECTOR_SIZE);
+			remaining--;
+			if(remaining == 0) break;
+		}
+		if(remaining == 0) break;
+	}*/
+
+	memcpy(buffer, leitura+relativeByte, size);
+	ctrl.openFilesArray[handle].currentPointer += actualReadSize;
+
+	/*BYTE *bufferAux;
 	DWORD sectors = bytesToSectors(size);
 	DWORD relativeByte = openFilesArray[handle].currentPointer % SIZE_SECTOR;	
 	
@@ -34,9 +67,11 @@ int read2 (FILE2 handle, char *buffer, int size){
 
 	if(readSectorFile(handle, sectors, bufferAux))
 		memcpy(buffer, bufferAux+relativeByte, size);
-	else return ERROR;	
+	else return ERROR;	*/
+
+	return actualReadSize;
 }
-*/
+
 int write2(FILE2 handle, char *buffer, int size){
 	BYTE *escrita;	
 	int i, j;
