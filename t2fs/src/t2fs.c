@@ -271,3 +271,10 @@ int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 	//free(record);
 	return 0;
 }
+
+int closedir2 (DIR2 handle) {
+	//Caso não esteja aberto
+	if(isOpenH(handle, 2) != 1) return -1;
+	ctrl.openDirectoriesArray[handle].valid = -1;
+	return 0;
+}
