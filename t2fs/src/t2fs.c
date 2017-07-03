@@ -77,6 +77,25 @@ int write2(FILE2 handle, char *buffer, int size){
 	return size;
 }
 
+FILE2 open2(char *filename){
+	char *name;
+	DWORD mftDir;
+	FILE2 handle;
+
+	if((name = getFileName(filename)) == NULL)
+		return ERROR;
+
+	if((mftDir = pathExists(filename, name)) <= 0)
+		return ERROR;
+
+	if((handle = getHandle(1)) == ERROR)
+		return ERROR;
+
+	ctrl.openFilesArray[handle] = getFile(mftDir, name);
+
+	return handle;
+}
+
 FILE2 create2 (char *filename){
 	char *name;
 	struct t2fs_record* newRecord;
