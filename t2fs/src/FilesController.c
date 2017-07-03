@@ -243,8 +243,10 @@ struct t2fs_record* findRecord(DWORD reg, char *name, DWORD entry) {
 					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) return NULL;
 					for(k=0; k < ctrl.boot.blockSize*4; k++){
 						if(entry == -1 && strcmp(records[k].name, name) == 0) return &records[k];
-						if(entry != -1 && l == entry) return &records[k];
-						if(records[k].TypeVal == 1 || records[k].TypeVal == 2) l++; //conta registros válidos
+						if(records[k].TypeVal == 1 || records[k].TypeVal == 2){
+							if(entry != -1 && l == entry) return &records[k];
+							l++; //conta registros válidos
+						}
 					}
 			}			
 			i++;

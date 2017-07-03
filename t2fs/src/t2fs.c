@@ -223,7 +223,6 @@ DIR2 opendir2 (char *pathname) {
 
 int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 	struct t2fs_record *record = malloc(sizeof(struct t2fs_record));
-
 	if(isOpenH(handle, 2) != 1) return -2; //Se não está aberto
 	record = findRecord(ctrl.openDirectoriesArray[handle].MFT, NULL, ctrl.openDirectoriesArray[handle].currentEntry);
 	if(record == NULL) return -1; //Se não há mais entradas
@@ -232,6 +231,7 @@ int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 	dentry->fileType = record->TypeVal;
 	dentry->fileSize = record->bytesFileSize;
 	ctrl.openDirectoriesArray[handle].currentEntry++;
-	free(record);
+	//segfault aqui na segunda vez que roda, então comentei
+	//free(record);
 	return 0;
 }

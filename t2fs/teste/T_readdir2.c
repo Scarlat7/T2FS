@@ -21,18 +21,21 @@ int main(){
 	if(mkdir2(path2) == ERRO) printf("Incapaz de criar %s\n", path2);
 	if(mkdir2(path3) == ERRO) printf("Incapaz de criar %s\n", path3);
 
+	if(isOpen(teste, 2) == 0) handle = opendir2(teste);
+
 	for(i = 0; i < 4; i ++) {
 		option = readdir2(handle, &current);
+		printf("option: %d\n", option);
 		if(option == 0) {
 			printf("\nEntry %d\n", i);
 			printf("Name: %s\tType: %d\tSize: %d\n", current.name, current.fileType, current.fileSize);
 		}
-		if(option == -1){
+		else if(option == -1){
 			printf("Fim da leitura.\n");
 			return 0;
 		}
 		else{ 
-			printf("Erro na função readdir2.\n");
+			printf("Retornou: %d. Erro na função readdir2.\n", option);
 			return 0;
 		}
 	}
