@@ -6,15 +6,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-/********************************************
+
 int seek2 (FILE2 handle, DWORD offset){
-	if(fileIsOpen(handle))
-		openFilesArray[handle].currentPointer += offset;
-	else return ERROR;
+	
+	if(!isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR)) 
+		return ERROR;
+	
+	if(offset == END){
+		ctrl.openFilesArray[handle].currentPointer = ctrl.openFilesArray[handle].bytesSize;
+	}else{
+		if(offset > ctrl.openFilesArray[handle].bytesSize){
+			return ERROR;
+		}
+		ctrl.openFilesArray[handle].currentPointer = offset; 
+	}
 
 	return 0;
 }
 
+/********************************************
 int read2 (FILE2 handle, char *buffer, int size){
 	BYTE *bufferAux;
 	DWORD sectors = bytesToSectors(size);
@@ -30,6 +40,10 @@ int read2 (FILE2 handle, char *buffer, int size){
 int write2(FILE2 handle, char *buffer, int size){
 	BYTE *escrita;	
 	int i, j;
+
+	if(!isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR)) 
+		return ERROR;
+
 	int BLOCK_SIZE = ctrl.boot.blockSize*SECTOR_SIZE;
 	DWORD mft = ctrl.openFilesArray[handle].MFT, currentLB, initial_sector;
 	DWORD n_blocks = ctrl.openFilesArray[handle].bytesSize/(ctrl.boot.blockSize*SECTOR_SIZE)+1;
@@ -82,9 +96,11 @@ FILE2 open2(char *filename){
 	DWORD mftDir;
 	FILE2 handle;
 
-	if(isOpen(filename, TYPEVAL_REGULAR)) return ERROR;
 
 	if((name = getFileName(filename)) == NULL)
+		return ERROR;
+
+	if(isOpen(name, TYPEVAL_REGULAR)) 
 		return ERROR;
 
 	if((mftDir = pathExists(filename, name)) <= 0)
@@ -197,7 +213,7 @@ DIR2 opendir2 (char *pathname) {
 	if(fatherReg <= 0) return -1;
 	if(hasFile(dirName, fatherReg) == -1) return -1;
 	//Verifica se está aberto
-	if(isOpen(pathname, 2)) return -1; //Working
+	if(isOpen(dirName, 2)) return -1; //Working
 	//Verifica se há espaço
 	newHandle = getHandle(2);
 	if(newHandle == -1) return -1;

@@ -11,6 +11,8 @@
 #include "t2fs.h"
 #include "BootController.h"
 
+#define END -1
+
 DWORD bytesToBlocks(DWORD bytes);
 
 /*retorna o nome do arquivo a partir do path*/

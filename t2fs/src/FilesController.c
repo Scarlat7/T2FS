@@ -336,9 +336,9 @@ DWORD pathExists(char *pathName, char *fileName) {
 	return reg;
 }
 
-int isOpen(char *pathname, int type){
+int isOpen(char *name, int type){
 	int i;
-	char *name = getFileName(pathname);
+
 	switch(type) {
 		case 1: for(i=0; i < N_OPENFILES; i++)
 			if(strcmp(ctrl.openFilesArray[i].name, name) == 0) return 1;
