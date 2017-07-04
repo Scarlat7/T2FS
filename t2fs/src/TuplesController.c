@@ -18,8 +18,8 @@ int deleteRegister(DWORD MFT){
 	do{
 		if(searchMFT(currentMFT, t) == ERROR) return ERROR;
 		t[0].atributeType = INVALID_PTR;
+		t[TUPLES_IN_REG-1].atributeType = INVALID_PTR;
 		write_sector(registerToSector(currentMFT), (BYTE*)t);
-		printf("sector %d\n", registerToSector(currentMFT));
 		currentMFT = t[TUPLES_IN_REG-1].virtualBlockNumber;
 	}while(t[TUPLES_IN_REG-1].atributeType == MFT_ADICIONAL);
 
@@ -28,35 +28,54 @@ int deleteRegister(DWORD MFT){
 
 int deleteBlocks(DWORD MFT, int* n){
 
-	int i, j;
+	struct t2fs_4tupla t[TUPLES_IN_REG];
 	DWORD currentMFT = MFT;
+	int i, j, contiguous;
 
-	if(searchMFT(MFT, t) == ERROR) return ERROR;
+	if(searchMFT(currentMFT, t) == -1) return -1;
 	if(t[TUPLES_IN_REG-1].atributeType == MFT_ADICIONAL){
-		deleteBlocks(MFT, n);
+		if(deleteBlocks(t[TUPLES_IN_REG-1].virtualBlockNumber, n) == -1)
+			return -1;
+	}else{
+			i = 0;
+			while(i < TUPLES_IN_REG && t[i].atributeType != FIM_ENCADEAMENTO){
+				i++;
+			}
+			//numero de blocos a serem deletados é maior que os mapeados pela tupla
+			if(t[i-1].virtualBlockNumber + t[i-1].numberOfContiguosBlocks < *n)
+				return -1;
 	}
-	
+
 	i = 0;
-	while(i < TUPLES_IN_REG && t[i].atributeType != FIM_ENCADEAMENTO)
+	while(i < TUPLES_IN_REG && (t[i].atributeType != FIM_ENCADEAMENTO || t[i].atributeType != MFT_ADICIONAL)){
 		i++;
-	
+	}
+
+	if(t[i].atributeType == MFT_ADICIONAL)
+		t[i].atributeType = FIM_ENCADEAMENTO;
+
 	while(*n > 0){
-		for(j = 0; j < t[i].numberOfContiguosBlocks; j++){
-			t[i].numberOfContiguosBlocks--;
+		contiguous = t[i].numberOfContiguosBlocks;
+
+		for(j = 0; j < contiguous; j++){
+			t[i-1].numberOfContiguosBlocks--;
+			setBitmap2(t[i-1].logicalBlockNumber + t[i-1].numberOfContiguosBlocks, 0);
 			*n = *n - 1;
-			if(*n == 0)
+			if(*n == 0){
+				writeRegister(currentMFT, t);
 				return 0;
+			}
 		}
 
-		t[i].atributeType = FIM_ENCADEAMENTO;
+		t[i-1].atributeType = FIM_ENCADEAMENTO;
 		i--;
-		if(i < 0){
-			if(*n > 0)
-				return -1;
-			else return 0;
+		if(i <= 0){
+			deleteRegister(currentMFT);
+			return 0;
 		}
 	}
-	
+
+	return 0;
 
 }
 
