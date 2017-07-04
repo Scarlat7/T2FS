@@ -26,6 +26,40 @@ int deleteRegister(DWORD MFT){
 	return 0;
 }
 
+int deleteBlocks(DWORD MFT, int* n){
+
+	int i, j;
+	DWORD currentMFT = MFT;
+
+	if(searchMFT(MFT, t) == ERROR) return ERROR;
+	if(t[TUPLES_IN_REG-1].atributeType == MFT_ADICIONAL){
+		deleteBlocks(MFT, n);
+	}
+	
+	i = 0;
+	while(i < TUPLES_IN_REG && t[i].atributeType != FIM_ENCADEAMENTO)
+		i++;
+	
+	while(*n > 0){
+		for(j = 0; j < t[i].numberOfContiguosBlocks; j++){
+			t[i].numberOfContiguosBlocks--;
+			*n = *n - 1;
+			if(*n == 0)
+				return 0;
+		}
+
+		t[i].atributeType = FIM_ENCADEAMENTO;
+		i--;
+		if(i < 0){
+			if(*n > 0)
+				return -1;
+			else return 0;
+		}
+	}
+	
+
+}
+
 int mapLBN(DWORD LBN, DWORD* sector){
 	//DWORD base;
 	//base = (1 + ctrl.boot.MFTBlocksSize)*ctrl.boot.blockSize;

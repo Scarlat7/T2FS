@@ -17,6 +17,9 @@
 #define TUPLES_IN_REG 32
 #define SECTORS_IN_REG 2
 
+/* Deletes "n" last blocks mapped by a register */
+int deleteBlocks(DWORD MFT, int n);
+
 /* Deletes a MFT register from disk 
 ** (ONLY THE REGISTER, THE MAPPED BLOCKS ARE NOT DELETED) */
 int deleteRegister(DWORD MFT);
