@@ -278,3 +278,23 @@ int closedir2 (DIR2 handle) {
 	ctrl.openDirectoriesArray[handle].valid = -1;
 	return 0;
 }
+
+int identify2 (char *name, int size){
+
+	char *str = "Lauren Silva Rolan Sampaio - 00262517\nLeonardo da Luz Dorneles - 00262516\nNatalia Gubiani Rampon - 00262502\n";
+
+	// Nao pode-se copiar um numero negativo de caracteres
+	if(size < 0)
+		return ERROR;
+
+	//Copia string para name
+	memcpy(name, str, size);
+
+	//Coloca sinalizacao de final de string
+	if(size == 0)
+		name[0] = '\0';
+	else
+		name[size-1] = '\0';
+
+	return 0;
+}
