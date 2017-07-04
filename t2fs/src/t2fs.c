@@ -253,17 +253,16 @@ DIR2 mkdir2 (char *pathname){
 	
 	return handle;
 }
-/***********************************************************
-int rmdir2 (char *pathname){
-	char *last = strrchr(pathname, '/');
-	char dirName[MAX_FILE_NAME_SIZE];
-	DWORD  fatherReg, dirReg;
-	struct t2fs_record record;
 
-	//Pega última palavra
-	if(last == NULL) return -1;
-	strcpy(dirName, last+1);
+/**
+int rmdir2 (char *pathname){
+	char *dirName = getFileName(pathname);
+	DWORD  fatherReg, dirReg;
+	int block = 1;
+	struct t2fs_record *record;
 	
+	//Caso tente excluir o root, retorna -1
+	if(strcmp(dirName, "") return -1;	
 	//Procura pelo pai
 	fatherReg = pathExists(pathname, dirName);
 	dirReg = hasFile(dirName, fatherReg);
@@ -271,15 +270,22 @@ int rmdir2 (char *pathname){
 	if(dirReg <= 0) return -1;
 
 	if(fatherReg > 0) {
+		record = findRecord(fatherReg, dirName, -1);
+		//Verifica se é um diretório
+		if(record.TypeVal != 2) return -2;
 		//Verifica se está vazio
-		//Pega o record
-		//Reduz blockSize do pai
-		//Invalida no disco		
+		if(record.bytesFileSize != 0) return -3;
+		//Deleta bloco do diretório
+		deleteBlocks(dirReg, &block);
+		//Diminui bytesize do pai
+
+		//Deleta MFT
+		deleteRegister(dirReg);	
+		return 0;
 	}
 	return -1;
 }
-**************************************************************/
-
+**/
 DIR2 opendir2 (char *pathname) {
 	int newHandle;
 	char *dirName = getFileName(pathname);

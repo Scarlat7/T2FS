@@ -161,14 +161,6 @@ OPENFILE getFile(DWORD fatherReg, char *name);
 */
 OPENDIRECTORY getDir(DWORD fatherReg, char *name);
 
-/* Returns the pos-th valid record name in the directory pointed by fatherMFT
-** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
-** @RETURN:	[CHAR*] - record's name
-** @ARGUMENTS: 	[IN - DWORD] pos - n-th valid name
-**		[IN - DWORD] fatherReg - father register
-*/
-char* getRecordName(DWORD fatherReg, DWORD pos);
-
 /* Returns a record in the MFT register reg named as name
 ** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
 ** @RETURN:	struct record
