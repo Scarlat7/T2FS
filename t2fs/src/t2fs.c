@@ -6,6 +6,29 @@
 #include <stdlib.h>
 #include <string.h>
 
+int delete2 (char *filename){
+
+	/*
+	char* name;
+	DWORD fatherDir, fileReg;
+
+	if((name = getFileName(filename)) == NULL)
+		return ERROR;
+
+	if((fatherDir = pathExists(filename, name)) <= 0)
+		return ERROR;
+
+	getRecord(filename, &record);
+
+	if(deleteBlocks(record.mft,record.blocksFileSize) == ERROR)
+		return ERROR;
+
+	deleteFileRecord(filename);
+
+	*/
+
+	return ERROR;
+}
 
 int seek2 (FILE2 handle, DWORD offset){
 	
