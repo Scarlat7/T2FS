@@ -32,6 +32,10 @@ int deleteBlocks(DWORD MFT, int* n){
 	DWORD currentMFT = MFT;
 	int i, j, contiguous;
 
+#ifdef DEBUG
+	printf("Recursao!\n");
+#endif
+
 	if(searchMFT(currentMFT, t) == -1) return -1;
 	if(t[TUPLES_IN_REG-1].atributeType == MFT_ADICIONAL){
 		if(deleteBlocks(t[TUPLES_IN_REG-1].virtualBlockNumber, n) == -1)
@@ -55,13 +59,27 @@ int deleteBlocks(DWORD MFT, int* n){
 		t[i].atributeType = FIM_ENCADEAMENTO;
 
 	while(*n > 0){
-		contiguous = t[i].numberOfContiguosBlocks;
+		contiguous = t[i-1].numberOfContiguosBlocks;
 
 		for(j = 0; j < contiguous; j++){
+#ifdef DEBUG
+	printf("1: Tupla %d contiguous %d\n", i-1, t[i-1].numberOfContiguosBlocks);
+#endif
 			t[i-1].numberOfContiguosBlocks--;
+#ifdef DEBUG
+	printf("2: Tupla %d contiguous %d\n", i-1, t[i-1].numberOfContiguosBlocks);
+	printf("LBN: %d, VBN: %d Conti: %d\n", t[i-1].logicalBlockNumber, t[i-1].virtualBlockNumber, t[i-1].numberOfContiguosBlocks);
+#endif
 			setBitmap2(t[i-1].logicalBlockNumber + t[i-1].numberOfContiguosBlocks, 0);
 			*n = *n - 1;
 			if(*n == 0){
+				if(t[i-1].numberOfContiguosBlocks == 0){
+					if(i-1 == 0){
+						deleteRegister(currentMFT);
+						return 0;
+					}
+					t[i-1].atributeType = FIM_ENCADEAMENTO;
+				}
 				writeRegister(currentMFT, t);
 				return 0;
 			}
