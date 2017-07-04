@@ -30,6 +30,23 @@ int delete2 (char *filename){
 	return ERROR;
 }
 
+int truncate2 (FILE2 handle){
+
+	DWORD n_blocks = ctrl.openFilesArray[handle].bytesSize/(ctrl.boot.blockSize*SECTOR_SIZE)+1;	
+	DWORD end_block = ctrl.openFilesArray[handle].currentPointer/(ctrl.boot.blockSize*SECTOR_SIZE)+1;
+	int delete_blocks = n_blocks - end_block;
+
+	if(!isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR)) 
+		return ERROR;
+
+	if(deleteBlocks(ctrl.openFilesArray[handle].MFT, &delete_blocks) == ERROR)
+		return ERROR;
+
+	ctrl.openFilesArray[handle].bytesSize = ctrl.openFilesArray[handle].currentPointer;
+
+	return ERROR;
+}
+
 int seek2 (FILE2 handle, DWORD offset){
 	
 	if(!isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR)) 
