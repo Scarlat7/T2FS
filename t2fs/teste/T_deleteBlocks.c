@@ -31,5 +31,9 @@ int main(){
 	printf("Teste: %d\n", deleteBlocks(9, &n));
 	printf("Registro 9 file size in blocks: %d\n\texpected 58\n,", getFileBlockSize(9));
 
+	n = getFileBlockSize(9);
+	printf("Teste: %d\n", deleteBlocks(9, &n));
+	printf("Registro 9 file size in blocks: %d\n\texpected 0\n,", getFileBlockSize(9));
+
 	return 0;
 }
