@@ -250,7 +250,61 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 }
 
 int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
+	int i, j, k, desloc;
+	DWORD sector, reg = fatherReg;
+	struct t2fs_4tupla tuplas[32];
+	struct t2fs_record *records = malloc(ctrl.boot.blockSize*4*sizeof(struct t2fs_record));
+	struct t2fs_record *recSec = malloc(4*sizeof(struct t2fs_record));
+
+	if(reg == -1) return -1;
+	do {
+		i = 0;
+		searchMFT(reg, tuplas);
+		do {
+			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
+
+					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) return -1;
+					for(k=0; k < ctrl.boot.blockSize*4; k++){
+							if(strcmp(records[k].name, record->name) == 0) {
+								mapLBN(tuplas[i].logicalBlockNumber + j, &sector);
+								desloc = k / 4;
+								if(read_sector(sector + desloc, (unsigned char*) recSec)) return -1;
+							recSec[k%4] = *record;
+							recSec[k%4].TypeVal = 0;
+							if(write_sector(sector + desloc, (unsigned char*)recSec)) return -1;
+							return 0;
+							}
+					}
+			}			
+			i++;
+		}while(tuplas[i].atributeType == 1);
+		reg = tuplas[i].virtualBlockNumber;
+	}while(tuplas[31].atributeType == 2);
 	return -1;
+}
+
+int hasAnyFile (DWORD reg) {
+	int i, j, k;
+	struct t2fs_4tupla tuplas[32];
+	struct t2fs_record *records = malloc(ctrl.boot.blockSize*4*sizeof(struct t2fs_record));
+
+	if(reg == -1) return -1;
+	do {
+		i = 0;
+		searchMFT(reg, tuplas);
+		do {
+			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
+
+					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) return -1;
+					for(k=0; k < ctrl.boot.blockSize*4; k++){
+						if(records[k].TypeVal == 1 || records[k].TypeVal == 2) return 1;
+					}
+			}			
+			i++;
+		}while(tuplas[i].atributeType == 1);
+		reg = tuplas[i].virtualBlockNumber;
+	}while(tuplas[31].atributeType == 2);
+	return 0;
 }
 
 struct t2fs_record* findRecord(DWORD reg, char *name, DWORD entry) {

@@ -169,3 +169,12 @@ OPENDIRECTORY getDir(DWORD fatherReg, char *name);
 **		[IN - DWORD] entry - number of the entry, if exists
 */
 struct t2fs_record * findRecord(DWORD reg, char *name, DWORD entry);
+
+/* Verifies if the directory which MFT register was passed as parameter is not empty
+** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517
+** @RETURN:	0 - if is empty
+**		1 - if has any file
+**		-1 - in case of error
+** @ARGUMENTS: 	[IN - DWORD] reg - father register
+*/
+int hasAnyFile (DWORD reg);
