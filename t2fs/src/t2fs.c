@@ -44,7 +44,7 @@ int truncate2 (FILE2 handle){
 
 	ctrl.openFilesArray[handle].bytesSize = ctrl.openFilesArray[handle].currentPointer;
 
-	return ERROR;
+	return 0;
 }
 
 int seek2 (FILE2 handle, DWORD offset){
