@@ -250,7 +250,7 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 }
 
 int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
-	int i, j, k, desloc;
+	int i, j, k, desloc, validos=0;
 	DWORD sector, reg = fatherReg;
 	struct t2fs_4tupla tuplas[32];
 	struct t2fs_record *records = malloc(ctrl.boot.blockSize*4*sizeof(struct t2fs_record));
@@ -264,16 +264,20 @@ int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
 			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
 
 					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) return -1;
+					validos = 0;
 					for(k=0; k < ctrl.boot.blockSize*4; k++){
 							if(strcmp(records[k].name, record->name) == 0) {
-								mapLBN(tuplas[i].logicalBlockNumber + j, &sector);
-								desloc = k / 4;
-								if(read_sector(sector + desloc, (unsigned char*) recSec)) return -1;
+							mapLBN(tuplas[i].logicalBlockNumber + j, &sector);
+							desloc = k / 4;
+							if(read_sector(sector + desloc, (unsigned char*) recSec)) return -1;
 							recSec[k%4] = *record;
 							recSec[k%4].TypeVal = 0;
 							if(write_sector(sector + desloc, (unsigned char*)recSec)) return -1;
+							//Se não houver nenhum válido, deleta o bloco
+							if(validos == 0) deleteBlocks(reg, &i);
 							return 0;
 							}
+							if(records[k].TypeVal > 0 && records[k].TypeVal < 3) validos++;
 					}
 			}			
 			i++;
