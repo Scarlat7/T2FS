@@ -11,10 +11,14 @@ int main(){
 	char teste[12];
 	strcpy(teste, "/natMoriiii");
 
-	if((handle = create2(teste)) == ERROR){
+	/*if((handle = create2(teste)) == ERROR){
 		printf("Incapaz de criar /Test\n");
 		return -1;
-	}	
+	}*/
+	if((handle = open2("/oi.a")) == ERROR){
+		printf("Incapaz de criar /Test\n");
+		return -1;
+	}
 	printf("********************************************\n");
 	printf("s1:%d\n",ctrl.openFilesArray[handle].bytesSize);
 	write2(handle, "cechin eh o maioral", 20);
@@ -25,7 +29,7 @@ int main(){
 	write2(handle, "se67", 5);
 	printf("s4:%d\n",ctrl.openFilesArray[handle].bytesSize);
 	for(i = 0; i < 1024; i++){
-		write2(handle, "a", 1);
+		write2(handle, "b", 1);
 	}
 	printf("********************************************\n");
 

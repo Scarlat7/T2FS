@@ -18,7 +18,9 @@
 int updateRecord(DWORD fatherReg, struct t2fs_record r);
 
 /* le n_sectors do arquivo a partir do currentPointer */
-int readRequestedSectors(FILE2 handle, int size, BYTE *leitura, DWORD n_sectors);
+int readRequestedSectors(FILE2 handle, int size, BYTE *leitura);
+
+int writeRequestedSectors(FILE2 handle, int size, BYTE *escrita);
 
 /* dado um número de bytes, retorna seu correspondente em blocos ocupados */
 DWORD bytesToBlocks(DWORD bytes);

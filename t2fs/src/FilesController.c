@@ -6,13 +6,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int readRequestedSectors(FILE2 handle, int size, BYTE *leitura, DWORD n_sectors){
+int readRequestedSectors(FILE2 handle, int size, BYTE *leitura){
 
 	int BLOCK_SIZE = ctrl.boot.blockSize*SECTOR_SIZE;
 	DWORD mft = ctrl.openFilesArray[handle].MFT, currentLB, initial_sector;
 	DWORD n_blocks = ctrl.openFilesArray[handle].bytesSize/(ctrl.boot.blockSize*SECTOR_SIZE)+1;
 	DWORD end_pointer = ctrl.openFilesArray[handle].currentPointer/(ctrl.boot.blockSize*SECTOR_SIZE);
 	DWORD offset = (ctrl.openFilesArray[handle].currentPointer%(ctrl.boot.blockSize*SECTOR_SIZE))/SECTOR_SIZE;
+
+	DWORD n_sectors = size/SECTOR_SIZE;
+	if(size%SECTOR_SIZE != 0)
+		n_sectors++;
 
 	DWORD remaining = n_sectors;
 	int i, j;
@@ -22,6 +26,35 @@ int readRequestedSectors(FILE2 handle, int size, BYTE *leitura, DWORD n_sectors)
 		mapLBN(currentLB, &initial_sector);
 		for(j = 0; j < (ctrl.boot.blockSize - offset); j++){
 			read_sector(initial_sector+ offset+j, leitura+i*BLOCK_SIZE+j*SECTOR_SIZE);
+			remaining--;
+			if(remaining == 0) break;
+		}
+		if(remaining == 0) break;
+	}
+
+	return 0;
+}
+
+int writeRequestedSectors(FILE2 handle, int size, BYTE *escrita){
+
+	int BLOCK_SIZE = ctrl.boot.blockSize*SECTOR_SIZE;
+	DWORD mft = ctrl.openFilesArray[handle].MFT, currentLB, initial_sector;
+	DWORD n_blocks = ctrl.openFilesArray[handle].bytesSize/(ctrl.boot.blockSize*SECTOR_SIZE)+1;
+	DWORD end_pointer = ctrl.openFilesArray[handle].currentPointer/(ctrl.boot.blockSize*SECTOR_SIZE);
+	DWORD offset = (ctrl.openFilesArray[handle].currentPointer%(ctrl.boot.blockSize*SECTOR_SIZE))/SECTOR_SIZE;
+
+	DWORD n_sectors = size/SECTOR_SIZE;
+	if(size%SECTOR_SIZE != 0)
+		n_sectors++;
+
+	DWORD remaining = n_sectors;
+	int i, j;
+
+	for(i = 0; i < n_blocks-end_pointer; i++){
+		mapVBN(mft, i+end_pointer, &currentLB);
+		mapLBN(currentLB, &initial_sector);
+		for(j = 0; j < (ctrl.boot.blockSize - offset); j++){
+			write_sector(initial_sector+offset+j, escrita+i*BLOCK_SIZE+j*SECTOR_SIZE);
 			remaining--;
 			if(remaining == 0) break;
 		}

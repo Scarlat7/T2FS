@@ -111,7 +111,7 @@ int read2 (FILE2 handle, char *buffer, int size){
 
 	leitura = malloc(n_sectors*SECTOR_SIZE);
 
-	if(readRequestedSectors(handle, actualReadSize, leitura, n_sectors) == ERROR) return ERROR;
+	if(readRequestedSectors(handle, actualReadSize, leitura) == ERROR) return ERROR;
 
 	/*for(i = 0; i < n_blocks-end_pointer; i++){
 		mapVBN(mft, i+end_pointer, &currentLB);
@@ -141,27 +141,27 @@ int read2 (FILE2 handle, char *buffer, int size){
 }
 
 int write2(FILE2 handle, char *buffer, int size){
-	BYTE *escrita;	
-	int i, j;
+	BYTE *escrita;
 
 	if(isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR) <= 0) 
 		return ERROR;
 
-	int BLOCK_SIZE = ctrl.boot.blockSize*SECTOR_SIZE;
+	/*int BLOCK_SIZE = ctrl.boot.blockSize*SECTOR_SIZE;
 	DWORD mft = ctrl.openFilesArray[handle].MFT, currentLB, initial_sector;
 	DWORD n_blocks = ctrl.openFilesArray[handle].bytesSize/(ctrl.boot.blockSize*SECTOR_SIZE)+1;
 	DWORD end_pointer = ctrl.openFilesArray[handle].currentPointer/(ctrl.boot.blockSize*SECTOR_SIZE);
-	DWORD relativeByte = ctrl.openFilesArray[handle].currentPointer % SECTOR_SIZE;
 	DWORD offset = (ctrl.openFilesArray[handle].currentPointer%(ctrl.boot.blockSize*SECTOR_SIZE))/SECTOR_SIZE;
+	int remaining = n_sectors;
+	*/
+	DWORD relativeByte = ctrl.openFilesArray[handle].currentPointer % SECTOR_SIZE;
 
 	DWORD n_sectors = size/SECTOR_SIZE;
 	if(size%SECTOR_SIZE != 0)
 		n_sectors++;
-
+	
 	escrita = malloc(n_sectors*SECTOR_SIZE);
-	int remaining = n_sectors;
 
-	if(readRequestedSectors(handle, size, escrita, n_sectors) == ERROR) return ERROR;
+	if(readRequestedSectors(handle, size, escrita) == ERROR) return ERROR;
 
 	/*for(i = 0; i < n_blocks-end_pointer; i++){
 		mapVBN(mft, i+end_pointer, &currentLB);
@@ -176,7 +176,9 @@ int write2(FILE2 handle, char *buffer, int size){
 
 	memcpy(escrita+relativeByte, buffer, size);
 
-	remaining = n_sectors;
+	if(writeRequestedSectors(handle, size, escrita) == ERROR) return ERROR;
+
+	/*remaining = n_sectors;
 	for(i = 0; i < n_blocks-end_pointer; i++){
 		mapVBN(mft, i+end_pointer, &currentLB);
 		mapLBN(currentLB, &initial_sector);
@@ -186,7 +188,7 @@ int write2(FILE2 handle, char *buffer, int size){
 			if(remaining == 0) break;
 		}
 		if(remaining == 0) break;
-	}
+	}*/
 
 	ctrl.openFilesArray[handle].bytesSize += updateFileSize(ctrl.openFilesArray[handle], size);
 	ctrl.openFilesArray[handle].currentPointer += size;
