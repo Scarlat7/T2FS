@@ -422,10 +422,10 @@ int isOpen(char *name, int type){
 
 	switch(type) {
 		case 1: for(i=0; i < N_OPENFILES; i++)
-			if(strcmp(ctrl.openFilesArray[i].name, name) == 0) return 1;
+			if(strcmp(ctrl.openFilesArray[i].name, name) == 0) return i+1;
 			break;
 		case 2: for(i=0; i < N_OPENDIRECTORIES; i++)
-			if(strcmp(ctrl.openDirectoriesArray[i].name, name) == 0) return 1;
+			if(strcmp(ctrl.openDirectoriesArray[i].name, name) == 0) return i+1;
 			break;
 		default: return -1;
 	}

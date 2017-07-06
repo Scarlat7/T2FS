@@ -7,36 +7,42 @@
 #include <string.h>
 
 int delete2 (char *filename){
-
-	/*
 	char* name;
-	DWORD fatherDir, fileReg;
+	DWORD fatherDir;
+	struct t2fs_record *record;
+	FILE2 handle;
 
 	if((name = getFileName(filename)) == NULL)
 		return ERROR;
 
+	if((handle = isOpen(name, TYPEVAL_REGULAR)) <= 0)
+		return ERROR;
+	else
+		ctrl.openFilesArray[handle-1].valid = -1;
+
 	if((fatherDir = pathExists(filename, name)) <= 0)
 		return ERROR;
 
-	getRecord(filename, &record);
-
-	if(deleteBlocks(record.mft,record.blocksFileSize) == ERROR)
+	if((record  = findRecord(fatherDir, name, -1)) == NULL)
 		return ERROR;
 
-	deleteFileRecord(filename);
+	if(deleteBlocks(record->MFTNumber,&(record->blocksFileSize)) == ERROR)
+		return ERROR;
 
-	*/
+	if(rmRecord(fatherDir, record) < 0 ) 
+		return ERROR;
 
-	return ERROR;
+	return 0;
+
 }
 
 int truncate2 (FILE2 handle){
 
 	DWORD n_blocks = ctrl.openFilesArray[handle].bytesSize/(ctrl.boot.blockSize*SECTOR_SIZE)+1;	
 	DWORD end_block = ctrl.openFilesArray[handle].currentPointer/(ctrl.boot.blockSize*SECTOR_SIZE)+1;
-	int delete_blocks = n_blocks - end_block;
+	DWORD delete_blocks = n_blocks - end_block;
 
-	if(!isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR)) 
+	if(isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR) <= 0) 
 		return ERROR;
 
 	if(deleteBlocks(ctrl.openFilesArray[handle].MFT, &delete_blocks) == ERROR)
@@ -49,7 +55,7 @@ int truncate2 (FILE2 handle){
 
 int seek2 (FILE2 handle, DWORD offset){
 	
-	if(!isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR)) 
+	if(isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR) <= 0) 
 		return ERROR;
 	
 	if(offset == END){
@@ -71,7 +77,7 @@ int read2 (FILE2 handle, char *buffer, int size){
 	DWORD relativeByte = ctrl.openFilesArray[handle].currentPointer % SECTOR_SIZE;
 	DWORD actualReadSize = size;
 
-	if(!isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR)) 
+	if(isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR) <= 0) 
 		return ERROR;
 	if(ctrl.openFilesArray[handle].currentPointer + size > ctrl.openFilesArray[handle].bytesSize){
 		actualReadSize = ctrl.openFilesArray[handle].bytesSize - ctrl.openFilesArray[handle].currentPointer;
@@ -116,7 +122,7 @@ int write2(FILE2 handle, char *buffer, int size){
 	BYTE *escrita;	
 	int i, j;
 
-	if(!isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR)) 
+	if(isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR) <= 0) 
 		return ERROR;
 
 	int BLOCK_SIZE = ctrl.boot.blockSize*SECTOR_SIZE;
@@ -257,7 +263,7 @@ DIR2 mkdir2 (char *pathname){
 int rmdir2 (char *pathname){
 	char *dirName = getFileName(pathname);
 	DWORD  fatherReg, dirReg;
-	int block = 1;
+	DWORD block = 1;
 	struct t2fs_record *record;
 	
 	//Caso tente excluir o root, retorna -1
@@ -304,7 +310,7 @@ DIR2 opendir2 (char *pathname) {
 
 int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 	struct t2fs_record *record = malloc(sizeof(struct t2fs_record));
-	if(isOpenH(handle, 2) != 1) return -2; //Se não está aberto
+	if(isOpenH(handle, 2) <= 0) return -2; //Se não está aberto
 	record = findRecord(ctrl.openDirectoriesArray[handle].MFT, NULL, ctrl.openDirectoriesArray[handle].currentEntry);
 	if(record == NULL) return -1; //Se não há mais entradas
 	//Converter record -> dirent2
@@ -319,7 +325,7 @@ int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 
 int closedir2 (DIR2 handle) {
 	//Caso não esteja aberto
-	if(isOpenH(handle, 2) != 1) return -1;
+	if(isOpenH(handle, 2) <= 1) return -1;
 	ctrl.openDirectoriesArray[handle].valid = -1;
 	return 0;
 }

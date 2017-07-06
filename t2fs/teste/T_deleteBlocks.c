@@ -7,7 +7,8 @@
 int main(){
 
 	DWORD LBN;
-	int i, n;
+	int i;
+	DWORD n;
 
 	/* Esse teste supõe que o arquivo t2fs_disk.dat está re-inicializado */
 

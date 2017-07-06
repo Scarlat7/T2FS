@@ -26,7 +26,7 @@ int deleteRegister(DWORD MFT){
 	return 0;
 }
 
-int deleteBlocks(DWORD MFT, int* n){
+int deleteBlocks(DWORD MFT, DWORD* n){
 
 	struct t2fs_4tupla t[TUPLES_IN_REG];
 	DWORD currentMFT = MFT;
