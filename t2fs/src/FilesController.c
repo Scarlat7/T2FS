@@ -200,6 +200,40 @@ int isValidName(char *name){
     return 0;
 }
 
+int updateRecord(DWORD fatherReg, struct t2fs_record r){
+
+	struct t2fs_record records[RECORDS_IN_SECTOR];
+	DWORD LBN, sector;
+	DWORD i = 0;
+	int j, dirSize, k;
+
+	dirSize = getFileBlockSize(fatherReg);
+
+	do{
+
+		mapVBN(fatherReg, i, &LBN);
+		mapLBN(LBN, &sector);
+
+		for(j = 0; j < ctrl.boot.blockSize; j++){
+			read_sector(sector, (BYTE*) records);
+			
+			for(k = 0; k < RECORDS_IN_SECTOR; k++){
+				if(!strcmp(records[k].name, r.name) && records[k].TypeVal == TYPEVAL_REGULAR){
+					records[k] = r;
+					write_sector(sector, (BYTE *)records);
+					return 0;
+				}
+			}
+
+		}
+
+		i++;
+	} while(i < dirSize);
+
+	return -1;
+
+}
+
 int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 	int j, i, desloc, lastFound = 0;
 	struct t2fs_4tupla tuplas[32];
@@ -250,7 +284,8 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 }
 
 int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
-	int i, j, k, desloc, validos=0;
+	int j, k, desloc, validos=0;
+	DWORD i;
 	DWORD sector, reg = fatherReg;
 	struct t2fs_4tupla tuplas[32];
 	struct t2fs_record *records = malloc(ctrl.boot.blockSize*4*sizeof(struct t2fs_record));
@@ -446,6 +481,7 @@ OPENFILE getFile(DWORD fatherReg, char *name){
 		file.blocksSize = record->blocksFileSize;
 		file.bytesSize = record->bytesFileSize;
 		file.MFT = record->MFTNumber;
+		file.fatherMFT = fatherReg;
 		strcpy(file.name, record->name);
 	}	
 	return file;

@@ -12,6 +12,10 @@
 #include "BootController.h"
 
 #define END -1
+#define RECORDS_IN_SECTOR 4
+
+/* updates a record with record.name = r.name in fatherReg */
+int updateRecord(DWORD fatherReg, struct t2fs_record r);
 
 /* le n_sectors do arquivo a partir do currentPointer */
 int readRequestedSectors(FILE2 handle, int size, BYTE *leitura, DWORD n_sectors);

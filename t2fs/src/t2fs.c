@@ -6,6 +6,28 @@
 #include <stdlib.h>
 #include <string.h>
 
+int close2 (FILE2 handle){
+
+	struct t2fs_record rec;
+
+	if(isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR) <= 0) 
+		return ERROR;
+
+	rec.TypeVal = TYPEVAL_REGULAR;
+	strncpy(rec.name, ctrl.openFilesArray[handle].name, MAX_FILE_NAME_SIZE);
+	rec.blocksFileSize = ctrl.openFilesArray[handle].blocksSize;
+	rec.bytesFileSize = ctrl.openFilesArray[handle].bytesSize;
+	rec.MFTNumber = ctrl.openFilesArray[handle].MFT;
+
+	if(updateRecord(ctrl.openFilesArray[handle].fatherMFT, rec) == ERROR)
+		return ERROR;
+
+	ctrl.openFilesArray[handle].valid = -1;
+
+	return 0;
+
+}
+
 int delete2 (char *filename){
 	char* name;
 	DWORD fatherDir;
@@ -211,7 +233,7 @@ FILE2 create2 (char *filename){
 	if(hasFile(name, mftDir) != ERROR)
 		return ERROR;
 
-	if((newRecord = createFile(name, 1)) == NULL)
+	if((newRecord = createFile(name, TYPEVAL_REGULAR)) == NULL)
 		return ERROR;
 
 	if(addRecord(mftDir, newRecord))

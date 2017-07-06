@@ -18,6 +18,7 @@
 typedef struct openFile{
 	int valid;
 	DWORD MFT;
+	DWORD fatherMFT;
 	DWORD currentPointer;
 	DWORD blocksSize;
 	DWORD bytesSize;

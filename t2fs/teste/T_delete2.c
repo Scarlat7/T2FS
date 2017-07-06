@@ -9,7 +9,7 @@ int main(){
 	//init_openFilesArray();
 	int handle;
 
-	handle = create2("/Eu");
+	handle = create2("/EuAmoOLeo2");
 
 
 	printf("********************************************\n");
@@ -19,7 +19,9 @@ int main(){
 		write2(handle, "a", 1);
 	}
 
-	printf("%d\n", delete2("/Eu"));
+	close2(handle);
+
+	printf("%d\n", delete2("/EuAmoOLeo2"));
 
 
 	printf("********************************************\n");
