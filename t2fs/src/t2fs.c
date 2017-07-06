@@ -37,7 +37,7 @@ int delete2 (char *filename){
 	if((name = getFileName(filename)) == NULL)
 		return ERROR;
 
-	if((handle = isOpen(name, TYPEVAL_REGULAR)) <= 0)
+	if((handle = isOpen(name, TYPEVAL_REGULAR)) < 0)
 		return ERROR;
 	else
 		ctrl.openFilesArray[handle-1].valid = -1;
