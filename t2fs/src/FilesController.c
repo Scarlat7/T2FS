@@ -426,7 +426,6 @@ struct t2fs_record* findRecord(DWORD reg, char *name, DWORD entry) {
 		i = 0;
 		searchMFT(reg, tuplas);
 		do {
-			printf("NoCB: %d\n", tuplas[i].numberOfContiguosBlocks);
 			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
 
 					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) {
@@ -444,8 +443,6 @@ struct t2fs_record* findRecord(DWORD reg, char *name, DWORD entry) {
 			i++;
 		}while(tuplas[i].atributeType == 1);
 		reg = tuplas[i].virtualBlockNumber;
-		printf("Tupla %d - Reg: %d\n", i, reg);
-		printf("Tupla 31 type: %d\n", tuplas[31].atributeType);
 	}while(tuplas[31].atributeType == 2);
 	printf("Não achou diretório.\n");
 	return NULL;
