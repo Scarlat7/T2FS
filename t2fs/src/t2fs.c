@@ -268,6 +268,8 @@ DIR2 mkdir2 (char *pathname){
 	if(hasFile(name, mftDir) != ERROR)
 		return ERROR;
 
+	printf("HasFile? %d\n", hasFile(name, mftDir));
+
 	if((newRecord = createFile(name, 2)) == NULL)
 		return ERROR;
 

@@ -494,27 +494,33 @@ int LBNToRecord(DWORD LBN, struct t2fs_record* records){
 }
 
 //Funcionando
-DWORD hasFile(char *directories, DWORD currentReg) {
-	struct t2fs_4tupla tuplas[32];
-	struct t2fs_record records[ctrl.boot.blockSize*4];
-	int i, j;
-	DWORD reg;
+DWORD hasFile(char *name, DWORD fatherReg) {
+	struct t2fs_record records[RECORDS_IN_SECTOR];
+	DWORD LBN, sector;
+	DWORD i = 0;
+	int j, dirSize, k;
 
-	reg = currentReg;
+	dirSize = getFileBlockSize(fatherReg);
 
-	do {
-		i = 0;
-		searchMFT(reg, tuplas);
-		do {
-			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
-					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) return -1;
-					reg = searchFile(records, directories);
-					if(reg) return reg;
+	do{
+
+		mapVBN(fatherReg, i, &LBN);
+		mapLBN(LBN, &sector);
+
+		for(j = 0; j < ctrl.boot.blockSize; j++){
+			read_sector(sector, (BYTE*) records);
+			
+			for(k = 0; k < RECORDS_IN_SECTOR; k++){
+				if(!strcmp(records[k].name, name) && records[k].TypeVal == 2){
+					return records[k].MFTNumber;
+				}
 			}
-			i++;
-		}while(tuplas[i].atributeType == 1);
-		reg = tuplas[i].virtualBlockNumber;
-	}while(tuplas[31].atributeType == 2);	
+
+		}
+
+		i++;
+	} while(i < dirSize);
+
 	return -1;
 }
 
