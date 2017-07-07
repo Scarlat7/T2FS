@@ -268,13 +268,51 @@ int updateRecord(DWORD fatherReg, struct t2fs_record r){
 }
 
 int addRecord(DWORD fatherReg, struct t2fs_record *record) {
-	int j, i, desloc, lastFound = 0;
+	/*int j, i, desloc, lastFound = 0;
 	struct t2fs_4tupla tuplas[32];
 	struct t2fs_record records[ctrl.boot.blockSize*4];
 	struct t2fs_record recSec[4];
 	DWORD nextReg, newVBN, LBN, sector;
-	nextReg = fatherReg;
-	do {
+	nextReg = fatherReg;*/
+
+	struct t2fs_record records[RECORDS_IN_SECTOR];
+	DWORD LBN;
+	int k, i, j;
+	DWORD sector;
+
+	i = 0;
+
+	do{
+
+		mapVBN(fatherReg, i, &LBN);
+		mapLBN(LBN, &sector);
+
+		for(j = 0; j < ctrl.boot.blockSize; j++){
+			read_sector(sector, (BYTE*) records);
+			
+			for(k = 0; k < RECORDS_IN_SECTOR; k++){
+				if(records[k].TypeVal == TYPEVAL_INVALIDO){
+					records[k] = *record;
+
+#ifdef DEBUG
+	for(i=0; i<ctrl.boot.blockSize; i++){
+		printf("Type: %d.\tBlocks: %d\tBytes: %d\tName: %s\n", records[i].TypeVal, records[i].blocksFileSize, records[i].bytesFileSize, records[i].name);
+	}
+#endif
+
+					write_sector(sector, (BYTE*)records);
+					return 0;
+				}
+			}
+
+		}
+
+		i++;
+	} while(1);
+
+	return ERROR;
+
+	/*do {
 		j = 0;
 		searchMFT(nextReg, tuplas);
 		//Procura pela última tupla do pai
@@ -313,7 +351,7 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 #endif
 	//Escreve o record adicionado logo abaixo do último
 	if(write_sector(sector + desloc, (unsigned char*)recSec)) return -1;
-	return 0;
+	return 0;*/
 }
 
 int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
