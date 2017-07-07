@@ -1,16 +1,16 @@
-- deletar records em um diretório com mais de um bloco
-	- deletar records em um bloco do meio até ficar vazio
-	- deletar bordas
-- escritas grandes
-	- escritas maiores que um setor (256+)
-	- escritas maiores que um bloco (1024+)
-- leituras grandes
-	- leituras maiores que um setor e que um bloco
-- criar uma árvore de diretórios maior
-- abrir 20 arquivos de uma vez
-- abrir 50 diretórios
-- testar disco cheio (MFTBlocksSize alocado)
-- deletar arquivo anteriormente aberto e tentar abrir depois
+( ) deletar records em um diretório com mais de um bloco
+	( ) deletar records em um bloco do meio até ficar vazio
+	( ) deletar records das extremidades 
+( ) escritas grandes
+	( ) escritas maiores que um setor (256+)
+	( ) escritas maiores que um bloco (1024+)
+( ) leituras grandes
+	( ) leituras maiores que um setor e que um bloco
+( ) criar uma árvore de diretórios maior
+(v) abrir 20 arquivos de uma vez (e tentar abrir extras)
+(v) abrir 50 diretórios (e tentar abrir extras)
+( ) testar disco cheio (MFTBlocksSize alocado)
+( ) deletar arquivo anteriormente aberto e tentar abrir depois
 
 - PS: PRECISA POR A FUNÇÃO DE INICIALIZAR A BIBLIOTECA NAS FUNÇÕES!
 - PS: TAMBÉM PRECISA LINKAR ESTATICAMENTE'
