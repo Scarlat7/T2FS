@@ -383,15 +383,18 @@ struct t2fs_record* findRecord(DWORD reg, char *name, DWORD entry) {
 	int i, j, k, l=0;
 	struct t2fs_4tupla tuplas[32];
 	struct t2fs_record *records = malloc(ctrl.boot.blockSize*4*sizeof(struct t2fs_record));
-
 	if(reg == -1) return NULL;
 	do {
 		i = 0;
 		searchMFT(reg, tuplas);
 		do {
+			printf("NoCB: %d\n", tuplas[i].numberOfContiguosBlocks);
 			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
 
-					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) return NULL;
+					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) {
+						printf("Incapaz de converter para record.\n");
+						return NULL;
+					}
 					for(k=0; k < ctrl.boot.blockSize*4; k++){
 						if(entry == -1 && strcmp(records[k].name, name) == 0) return &records[k];
 						if(records[k].TypeVal == 1 || records[k].TypeVal == 2){
@@ -403,7 +406,10 @@ struct t2fs_record* findRecord(DWORD reg, char *name, DWORD entry) {
 			i++;
 		}while(tuplas[i].atributeType == 1);
 		reg = tuplas[i].virtualBlockNumber;
+		printf("Tupla %d - Reg: %d\n", i, reg);
+		printf("Tupla 31 type: %d\n", tuplas[31].atributeType);
 	}while(tuplas[31].atributeType == 2);
+	printf("Não achou diretório.\n");
 	return NULL;
 }
 
@@ -523,7 +529,10 @@ OPENFILE getFile(DWORD fatherReg, char *name){
 OPENDIRECTORY getDir(DWORD fatherReg, char *name) {
 	OPENDIRECTORY dir;
 	struct t2fs_record *record = findRecord(fatherReg, name, -1);
-	if(record == NULL) printf("Deu ruim no findRecord.\n");
+	if(record == NULL) {
+		dir.valid = -1;
+		printf("Deu ruim no findRecord.\n");
+	}
 	else {
 		dir.valid = 1;
 		dir.currentEntry = 0;
