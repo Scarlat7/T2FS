@@ -284,7 +284,7 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 	i = 0;
 
 	do{
-
+		printf("FatherReg: %d\n", fatherReg);
 		mapVBN(fatherReg, i, &LBN);
 		mapLBN(LBN, &sector);
 
@@ -299,8 +299,8 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 	for(i=0; i<ctrl.boot.blockSize; i++){
 		printf("Type: %d.\tBlocks: %d\tBytes: %d\tName: %s\n", records[i].TypeVal, records[i].blocksFileSize, records[i].bytesFileSize, records[i].name);
 	}
+	printf("FatherReg: %d\n", fatherReg);
 #endif
-
 					write_sector(sector, (BYTE*)records);
 					return 0;
 				}
@@ -315,6 +315,7 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 
 	/*do {
 		j = 0;
+
 		searchMFT(nextReg, tuplas);
 		//Procura pela última tupla do pai
 		while(tuplas[j].atributeType == 1){
@@ -522,14 +523,18 @@ DWORD hasFile(char *name, DWORD fatherReg) {
 	return -1;
 }
 
-//Funcionando
+//Funcionando --- dá pra tirar o *filename
 DWORD pathExists(char *pathName, char *fileName) {
 	char path[strlen(pathName)+1];
+	//Manha pra pegar path até antes do file
+	char *ptr;
 	strcpy(path, pathName);
+	ptr = strrchr(path, '/');
+	*ptr = '\0';
 	char *directories = strtok(path, "/");
 	DWORD reg = 1, i;
 	//Verifica se o path até a pasta pai existe
-	while(directories && strcmp(directories, fileName)){
+	while(directories){
 		i = hasFile(directories, reg);
 		reg = i;
 		directories = strtok(NULL, "/");

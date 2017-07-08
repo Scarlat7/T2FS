@@ -19,19 +19,21 @@ int main(){
 	mkdir2("/A/Natalia/namora/o/cara/dos/Lolzinho");//12
 	mkdir2("/A/Natalia/namora/o/cara/dos/files");	//13
 	mkdir2("/A/Natalia/namora/o/Leo");		//14
-	mkdir2("/A/Lauren/gosta/de/bolo/de");		//15 Tá dando erro aqui
+	mkdir2("/A/Lauren/gosta/de/bolo/de");		//15
 	mkdir2("/A/Lauren/gosta/de/bolo/de/cenoura");	//16
 	mkdir2("/A/Lauren/gosta/de/bolo/de/milho");	//17
 	mkdir2("/A/Lauren/gosta/de/bolo/de/chocolate");	//18
+	mkdir2("/A/Lauren/gosta/de/bolo/de/morango"); 	//19
+	mkdir2("/A/Lauren/gosta/de/bolo/de/amendoas");  //20
 
-/*
+
 	if(rmdir2("/A/Lauren/gosta/de/bolo") == 0) printf("Oh, não! Bolo foi removido :/\n");
 	else printf("Sucesso! Bolo não foi removido!");
 	if(rmdir2("/A/Natalia/namora/o/Leo") == 0) printf("Leo foi removido com sucesso!\n");
 	else printf("Oh, não! Leo não pôde ser removido :/\n");
 	if(rmdir2("/") == 0) printf("Oh, não! O root foi removido!\n");
 	else printf("Sucesso! O root não foi removido.\n");
-*/
+
 	return 0;
 	
 }

@@ -6,9 +6,9 @@
 	( ) escritas maiores que um bloco (1024+)
 ( ) leituras grandes
 	( ) leituras maiores que um setor e que um bloco
-( ) criar uma árvore de diretórios maior
-(v) abrir 20 arquivos de uma vez (e tentar abrir extras)
-(v) abrir 50 diretórios (e tentar abrir extras)
+(v) criar uma árvore de diretórios maior
+(v) abrir 20 arquivos de uma vez
+(v) abrir 50 diretórios
 ( ) testar disco cheio (MFTBlocksSize alocado)
 ( ) deletar arquivo anteriormente aberto e tentar abrir depois
 
