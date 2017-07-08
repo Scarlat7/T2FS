@@ -38,11 +38,11 @@ int main(){
 	}
 	
 	
-
-	for(i = 0; i < SIZE; i++){
+	escrita[0] = 'D';
+	for(i = 1; i < SIZE; i++){
 		escrita[i] = 'a';
 	}
-
+	escrita[SIZE-1] = '\0';
 	
 	
 	write2(handle, escrita, SIZE);
