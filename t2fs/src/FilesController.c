@@ -38,8 +38,9 @@ int readRequestedSectors(FILE2 handle, int size, BYTE *leitura){
 int writeRequestedSectors(FILE2 handle, int size, BYTE *escrita){
 
 	int BLOCK_SIZE = ctrl.boot.blockSize*SECTOR_SIZE;
+	DWORD fileSize = ctrl.openFilesArray[handle].bytesSize;
 	DWORD mft = ctrl.openFilesArray[handle].MFT, currentLB, initial_sector;
-	DWORD n_blocks = ctrl.openFilesArray[handle].bytesSize/(ctrl.boot.blockSize*SECTOR_SIZE)+1;
+	DWORD n_blocks = (fileSize+updateFileSize(ctrl.openFilesArray[handle], size))/(ctrl.boot.blockSize*SECTOR_SIZE)+1;
 	DWORD end_pointer = ctrl.openFilesArray[handle].currentPointer/(ctrl.boot.blockSize*SECTOR_SIZE);
 	DWORD offset = (ctrl.openFilesArray[handle].currentPointer%(ctrl.boot.blockSize*SECTOR_SIZE))/SECTOR_SIZE;
 
