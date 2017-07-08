@@ -357,6 +357,41 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 }
 
 int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
+	struct t2fs_record records[RECORDS_IN_SECTOR];
+	DWORD LBN, sector;
+	DWORD validos = 0, i = 0;
+	int j, dirSize, k;
+
+	dirSize = getFileBlockSize(fatherReg);
+
+	do{
+
+		mapVBN(fatherReg, i, &LBN);
+		mapLBN(LBN, &sector);
+
+		for(j = 0; j < ctrl.boot.blockSize; j++){
+			read_sector(sector, (BYTE*) records);
+			
+			for(k = 0; k < RECORDS_IN_SECTOR; k++){
+				if(!strcmp(records[k].name, record->name) && records[k].TypeVal == 2){
+					if(read_sector(sector, (unsigned char*) records)) return -1;
+					
+					records[k] = *record;
+					records[k].TypeVal = 0;
+					if(write_sector(sector, (unsigned char*)records)) return -1;
+					//Tenho que rever isso
+					//if(validos == 0) deleteBlocks(fatherReg, &i);
+					return 0;
+				}
+				if(records[k].TypeVal > 0 && records[k].TypeVal < 3) validos++;
+			}
+
+		}
+		i++;
+	} while(i < dirSize);
+	return -1;
+
+/*
 	int j, k, desloc, validos=0;
 	DWORD i;
 	DWORD sector, reg = fatherReg;
@@ -393,6 +428,7 @@ int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
 		reg = tuplas[i].virtualBlockNumber;
 	}while(tuplas[31].atributeType == 2);
 	return -1;
+*/
 }
 
 int hasAnyFile (DWORD reg) {
