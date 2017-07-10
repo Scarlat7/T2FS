@@ -177,7 +177,10 @@ FILE2 create2 (char *filename){
 
 	if((name = getFileName(filename)) == NULL)
 		return ERROR;
-		
+	
+	if(isValidName(name))
+		return ERROR;
+
 	if((mftDir = pathExists(filename, name)) <= 0)
 		return ERROR;
 
@@ -210,7 +213,10 @@ DIR2 mkdir2 (char *pathname){
 
 	if((name = getFileName(pathname)) == NULL)
 		return ERROR;
-		
+
+	if(isValidName(name))
+		return ERROR;
+
 	if((mftDir = pathExists(pathname, name)) <= 0)
 		return ERROR;
 

@@ -130,7 +130,7 @@ int isValidName(char *name){
     if(strlen(name) > 51 || strlen(name) < 0) return 1;
     for(i = 0; i<strlen(name); i++) {
         current = name[i];
-        if((current < 'A' || current > 'z') && (current <'0' || current > '9') && current != '.') return 1;
+        if((current < 'A' || current > 'Z') && (current < 'a' || current > 'z') && (current <'0' || current > '9') && current != '.') return 1;
     }
     return 0;
 }
