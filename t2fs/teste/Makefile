@@ -45,101 +45,101 @@ RMB=rmBlocks
 
 all: T_$(INIT) T_$(READBOOT) T_$(VALIDNAME) T_$(SEARCHMFT) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(OPDIR) T_$(CREATE) T_$(WRITE) T_$(OPEN) T_$(READD) T_$(SEEK) T_$(READ) T_$(CLOSED) T_$(DELR) T_$(DELB) T_$(ID) T_$(TRUNC) T_$(RMDIR) T_$(DEL) T_$(CLOSE) T_$(STDIR) T_$(STFILE) T_$(TT) T_$(ULT) T_$(RMB)
 
-T_$(INIT): T_$(INIT).c $(BIN_DIR)/BootController.o $(BIN_DIR)/apidisk.o
-	$(CC) -o T_$(INIT) T_$(INIT).c -I$(INC_DIR)/ $(BIN_DIR)/BootController.o $(BIN_DIR)/apidisk.o $(CFLAGS)
+T_$(INIT): T_$(INIT).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(INIT) T_$(INIT).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(READBOOT): T_$(READBOOT).c $(BIN_DIR)/BootController.o $(BIN_DIR)/apidisk.o
-	$(CC) -o T_$(READBOOT) T_$(READBOOT).c -I$(INC_DIR)/ $(BIN_DIR)/BootController.o $(BIN_DIR)/apidisk.o $(CFLAGS)
+T_$(READBOOT): T_$(READBOOT).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(READBOOT) T_$(READBOOT).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(VALIDNAME): T_$(VALIDNAME).c $(BIN_DIR)/FilesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/bitmap2.o
-	$(CC) -o T_$(VALIDNAME) T_$(VALIDNAME).c -I$(INC_DIR)/ $(BIN_DIR)/FilesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/TuplesController.o $(BIN_DIR)/bitmap2.o $(CFLAGS)
+T_$(VALIDNAME): T_$(VALIDNAME).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(VALIDNAME) T_$(VALIDNAME).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(SEARCHMFT): T_$(SEARCHMFT).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o
-	$(CC) -o T_$(SEARCHMFT) T_$(SEARCHMFT).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/BootController.o $(CFLAGS)
+T_$(SEARCHMFT): T_$(SEARCHMFT).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(SEARCHMFT) T_$(SEARCHMFT).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(PRINTRECORD): T_$(PRINTRECORD).c $(BIN_DIR)/FilesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/TuplesController.o $(BIN_DIR)/bitmap2.o
-	$(CC) -o T_$(PRINTRECORD) T_$(PRINTRECORD).c -I$(INC_DIR)/ $(BIN_DIR)/BootController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/TuplesController.o $(BIN_DIR)/bitmap2.o $(CFLAGS)
+T_$(PRINTRECORD): T_$(PRINTRECORD).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(PRINTRECORD) T_$(PRINTRECORD).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(REGSEC): T_$(REGSEC).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o
-	$(CC) -o T_$(REGSEC) T_$(REGSEC).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(CFLAGS)
+T_$(REGSEC): T_$(REGSEC).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(REGSEC) T_$(REGSEC).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(FIND): T_$(FIND).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o
-	$(CC) -o T_$(FIND) T_$(FIND).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(CFLAGS)
+T_$(FIND): T_$(FIND).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(FIND) T_$(FIND).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(VBN): T_$(VBN).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o
-	$(CC) -o T_$(VBN) T_$(VBN).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(CFLAGS)
+T_$(VBN): T_$(VBN).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(VBN) T_$(VBN).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(MKDIR): T_$(MKDIR).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(MKDIR) T_$(MKDIR).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(MKDIR): T_$(MKDIR).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(MKDIR) T_$(MKDIR).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(OPDIR): T_$(OPDIR).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(OPDIR) T_$(OPDIR).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(OPDIR): T_$(OPDIR).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(OPDIR) T_$(OPDIR).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(CLOSED): T_$(CLOSED).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(CLOSED) T_$(CLOSED).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(CLOSED): T_$(CLOSED).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(CLOSED) T_$(CLOSED).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(ADD): T_$(ADD).c $(BIN_DIR)/FilesController.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/TuplesController.o
-	$(CC) -o T_$(ADD) T_$(ADD).c -I$(INC_DIR)/ $(BIN_DIR)/FilesController.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/TuplesController.o $(CFLAGS)
+T_$(ADD): T_$(ADD).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(ADD) T_$(ADD).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
 $(MAIN): $(MAIN).c $(BIN_DIR)/bitmap2.o $(BIN_DIR)/apidisk.o
 	$(CC) -o $(MAIN) $(MAIN).c -I$(INC_DIR)/ $(BIN_DIR)/bitmap2.o $(BIN_DIR)/apidisk.o $(CFLAGS)
 
-T_$(CREATE): T_$(CREATE).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(CREATE) T_$(CREATE).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(CREATE): T_$(CREATE).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(CREATE) T_$(CREATE).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(WRITE): T_$(WRITE).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(WRITE) T_$(WRITE).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(WRITE): T_$(WRITE).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(WRITE) T_$(WRITE).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(OPEN): T_$(OPEN).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(OPEN) T_$(OPEN).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(OPEN): T_$(OPEN).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(OPEN) T_$(OPEN).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(READD): T_$(READD).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(READD) T_$(READD).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(READD): T_$(READD).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(READD) T_$(READD).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(SEEK): T_$(SEEK).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(SEEK) T_$(SEEK).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(SEEK): T_$(SEEK).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(SEEK) T_$(SEEK).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(READ): T_$(READ).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(READ) T_$(READ).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(READ): T_$(READ).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(READ) T_$(READ).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(DELR): T_$(DELR).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(DELR) T_$(DELR).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(DELR): T_$(DELR).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(DELR) T_$(DELR).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(DELB): T_$(DELB).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(DELB) T_$(DELB).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(DELB): T_$(DELB).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(DELB) T_$(DELB).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(ID): T_$(ID).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(ID) T_$(ID).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(ID): T_$(ID).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(ID) T_$(ID).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(TRUNC): T_$(TRUNC).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(TRUNC) T_$(TRUNC).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(TRUNC): T_$(TRUNC).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(TRUNC) T_$(TRUNC).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(HAS): T_$(HAS).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(HAS) T_$(HAS).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(HAS): T_$(HAS).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(HAS) T_$(HAS).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(RMDIR): T_$(RMDIR).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(RMDIR) T_$(RMDIR).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(RMDIR): T_$(RMDIR).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(RMDIR) T_$(RMDIR).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(DEL): T_$(DEL).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(DEL) T_$(DEL).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(DEL): T_$(DEL).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(DEL) T_$(DEL).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(CLOSE): T_$(CLOSE).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(CLOSE) T_$(CLOSE).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(CLOSE): T_$(CLOSE).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(CLOSE) T_$(CLOSE).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(STDIR): T_$(STDIR).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(STDIR) T_$(STDIR).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(STDIR): T_$(STDIR).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(STDIR) T_$(STDIR).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(STFILE): T_$(STFILE).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(STFILE) T_$(STFILE).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(STFILE): T_$(STFILE).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(STFILE) T_$(STFILE).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(TT): T_$(TT).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(TT) T_$(TT).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(TT): T_$(TT).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(TT) T_$(TT).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(ULT): T_$(ULT).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(ULT) T_$(ULT).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(ULT): T_$(ULT).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(ULT) T_$(ULT).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
-T_$(RMB): T_$(RMB).c $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o
-	$(CC) -o T_$(RMB) T_$(RMB).c -I$(INC_DIR)/ $(BIN_DIR)/TuplesController.o $(BIN_DIR)/apidisk.o $(BIN_DIR)/BootController.o $(BIN_DIR)/bitmap2.o $(BIN_DIR)/FilesController.o $(BIN_DIR)/t2fs.o $(CFLAGS)
+T_$(RMB): T_$(RMB).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o T_$(RMB) T_$(RMB).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
 clean:
 	rm -rf *.o *~ T_$(INIT) T_$(READBOOT) T_$(SEARCHMFT) T_$(VALIDNAME) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(OPDIR) T_$(CREATE) T_$(WRITE) T_$(OPEN) T_$(READD) T_$(SEEK) T_$(READ) T_$(CLOSED) T_$(DELR) T_$(DELB) T_$(ID) T_$(TRUNC) T_$(RMDIR) T_$(DEL) T_$(CLOSE) T_$(STDIR) T_$(STFILE) T_$(TT) T_$(ULT) T_$(RMB)
