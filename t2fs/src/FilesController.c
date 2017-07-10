@@ -170,13 +170,6 @@ int updateRecord(DWORD fatherReg, struct t2fs_record r){
 }
 
 int addRecord(DWORD fatherReg, struct t2fs_record *record) {
-	/*int j, i, desloc, lastFound = 0;
-	struct t2fs_4tupla tuplas[32];
-	struct t2fs_record records[ctrl.boot.blockSize*4];
-	struct t2fs_record recSec[4];
-	DWORD nextReg, newVBN, LBN, sector;
-	nextReg = fatherReg;*/
-
 	struct t2fs_record records[RECORDS_IN_SECTOR];
 	DWORD LBN;
 	int k, i, j;
@@ -213,48 +206,6 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 	} while(1);
 
 	return ERROR;
-
-	/*do {
-		j = 0;
-
-		searchMFT(nextReg, tuplas);
-		//Procura pela última tupla do pai
-		while(tuplas[j].atributeType == 1){
-			j++;
-		}
-		if(tuplas[j].atributeType == 0) {
-			if(j > 0) j--;
-			//Pega o último VBN
-			newVBN = tuplas[j].virtualBlockNumber + tuplas[j].numberOfContiguosBlocks - 1;
-			
-		}
-		nextReg = tuplas[31].virtualBlockNumber;
-	}while(tuplas[31].atributeType == 2);
-	//Atualiza registro MFT do pai
-	if(mapVBN(fatherReg, newVBN, &LBN)) return -1;
-	//Pega records desse LBN e chega até o fim
-	if(LBNToRecord(LBN, records)) return -1;
-	j = 0;
-	do {
-		if(records[j].TypeVal > 0 && records[j].TypeVal < 3) j++;
-		else lastFound = 1;
-	}while(lastFound == 0);
-	
-	//Mapeia LBN para setor de início
-	if(mapLBN(LBN, &sector)) return -1;
-	
-	desloc = j / 4;
-	if(read_sector(sector + desloc, (unsigned char*) recSec)) return -1;
-	recSec[j%4] = *record;
-
-#ifdef DEBUG
-	for(i=0; i<4; i++){
-		printf("Type: %d.\tBlocks: %d\tBytes: %d\tName: %s\n", recSec[i].TypeVal, recSec[i].blocksFileSize, recSec[i].bytesFileSize, recSec[i].name);
-	}
-#endif
-	//Escreve o record adicionado logo abaixo do último
-	if(write_sector(sector + desloc, (unsigned char*)recSec)) return -1;
-	return 0;*/
 }
 
 int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
@@ -279,8 +230,6 @@ int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
 					records[k] = *record;
 					records[k].TypeVal = TYPEVAL_INVALIDO;
 					if(write_sector(sector+j, (unsigned char*)records)) return -1;
-					//Tenho que rever isso
-					//if(validos == 0) deleteBlocks(fatherReg, &i);
 					return 0;
 				}
 				if(records[k].TypeVal > 0 && records[k].TypeVal < 3) validos++;
@@ -291,45 +240,6 @@ int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
 	} while(i < dirSize);
 	
 	return -1;
-
-/*
-	int j, k, desloc, validos=0;
-	DWORD i;
-	DWORD sector, reg = fatherReg;
-	struct t2fs_4tupla tuplas[32];
-	struct t2fs_record *records = malloc(ctrl.boot.blockSize*4*sizeof(struct t2fs_record));
-	struct t2fs_record *recSec = malloc(4*sizeof(struct t2fs_record));
-
-	if(reg == -1) return -1;
-	do {
-		i = 0;
-		searchMFT(reg, tuplas);
-		do {
-			for(j = 0; j < tuplas[i].numberOfContiguosBlocks; j++){
-
-					if(LBNToRecord(tuplas[i].logicalBlockNumber + j, records)) return -1;
-					validos = 0;
-					for(k=0; k < ctrl.boot.blockSize*4; k++){
-							if(strcmp(records[k].name, record->name) == 0) {
-							mapLBN(tuplas[i].logicalBlockNumber + j, &sector);
-							desloc = k / 4;
-							if(read_sector(sector + desloc, (unsigned char*) recSec)) return -1;
-							recSec[k%4] = *record;
-							recSec[k%4].TypeVal = 0;
-							if(write_sector(sector + desloc, (unsigned char*)recSec)) return -1;
-							//Se não houver nenhum válido, deleta o bloco
-							if(validos == 0) deleteBlocks(reg, &i);
-							return 0;
-							}
-							if(records[k].TypeVal > 0 && records[k].TypeVal < 3) validos++;
-					}
-			}			
-			i++;
-		}while(tuplas[i].atributeType == 1);
-		reg = tuplas[i].virtualBlockNumber;
-	}while(tuplas[31].atributeType == 2);
-	return -1;
-*/
 }
 
 int hasAnyFile (DWORD reg) {
@@ -383,7 +293,6 @@ struct t2fs_record* findRecord(DWORD reg, char *name, DWORD entry) {
 		}while(tuplas[i].atributeType == 1);
 		reg = tuplas[i].virtualBlockNumber;
 	}while(tuplas[31].atributeType == 2);
-	printf("Não achou diretório.\n");
 	return NULL;
 }
 
@@ -406,7 +315,7 @@ void printRecords(DWORD reg){
 	}while(tuplas[31].atributeType == 2);
 }
 
-//Compila, mas não testei
+//Compila
 DWORD searchFile(struct t2fs_record *records, char *name) {
 	int i;
 	for(i=0; i< 4*ctrl.boot.blockSize; i++){
@@ -415,7 +324,6 @@ DWORD searchFile(struct t2fs_record *records, char *name) {
 	return -1;
 }
 
-//Dá seg fault quando testada separada, mas funciona quando chamada
 int LBNToRecord(DWORD LBN, struct t2fs_record* records){
 	int i;
 	DWORD index=0;
@@ -461,7 +369,7 @@ DWORD hasFile(char *name, DWORD fatherReg) {
 }
 
 //Funcionando --- dá pra tirar o *filename
-DWORD pathExists(char *pathName, char *fileName) {
+DWORD pathExists(char *pathName) {
 	char path[strlen(pathName)+1];
 	//Manha pra pegar path até antes do file
 	char *ptr;

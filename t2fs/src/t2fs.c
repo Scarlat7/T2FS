@@ -42,7 +42,7 @@ int delete2 (char *filename){
 	else
 		ctrl.openFilesArray[handle-1].valid = -1;
 
-	if((fatherDir = pathExists(filename, name)) <= 0)
+	if((fatherDir = pathExists(filename)) <= 0)
 		return ERROR;
 
 	if((record  = findRecord(fatherDir, name, -1)) == NULL)
@@ -158,7 +158,7 @@ FILE2 open2(char *filename){
 	if(isOpen(name, TYPEVAL_REGULAR)) 
 		return ERROR;
 
-	if((mftDir = pathExists(filename, name)) <= 0)
+	if((mftDir = pathExists(filename)) <= 0)
 		return ERROR;
 
 	if((handle = getHandle(TYPEVAL_REGULAR)) == ERROR)
@@ -181,7 +181,7 @@ FILE2 create2 (char *filename){
 	if(isValidName(name))
 		return ERROR;
 
-	if((mftDir = pathExists(filename, name)) <= 0)
+	if((mftDir = pathExists(filename)) <= 0)
 		return ERROR;
 
 	if(hasFile(name, mftDir) != ERROR)
@@ -204,20 +204,18 @@ FILE2 create2 (char *filename){
 	
 }
 
-DIR2 mkdir2 (char *pathname){
+int mkdir2 (char *pathname){
 	char *name;
 	struct t2fs_record* newRecord;
 	DWORD mftDir;
-
-	DIR2 handle;
-
+	
 	if((name = getFileName(pathname)) == NULL)
 		return ERROR;
 
 	if(isValidName(name))
 		return ERROR;
 
-	if((mftDir = pathExists(pathname, name)) <= 0)
+	if((mftDir = pathExists(pathname)) <= 0)
 		return ERROR;
 
 	if(hasFile(name, mftDir) != ERROR)
@@ -243,7 +241,7 @@ int rmdir2 (char *pathname){
 	//Caso tente excluir o root, retorna -1
 	if(strcmp(pathname, "/")==0) return -1;	
 	//Procura pelo pai
-	fatherReg = pathExists(pathname, dirName);
+	fatherReg = pathExists(pathname);
 	dirReg = hasFile(dirName, fatherReg);
 	//Se a pasta não existe, retorna erro
 	if(dirReg <= 0) return -1;
@@ -268,7 +266,7 @@ int rmdir2 (char *pathname){
 DIR2 opendir2 (char *pathname) {
 	int newHandle;
 	char *dirName = getFileName(pathname);
-	DWORD fatherReg = pathExists(pathname, dirName);
+	DWORD fatherReg = pathExists(pathname);
 	
 	//Verifica se diretório existe
 	if(fatherReg <= 0) return -1;
@@ -283,7 +281,7 @@ DIR2 opendir2 (char *pathname) {
 }
 
 int readdir2 (DIR2 handle, DIRENT2 *dentry) {
-	struct t2fs_record *record = malloc(sizeof(struct t2fs_record));
+	struct t2fs_record *record;
 	if(isOpenH(handle, 2) <= 0) return -2; //Se não está aberto
 	record = findRecord(ctrl.openDirectoriesArray[handle].MFT, NULL, ctrl.openDirectoriesArray[handle].currentEntry);
 	if(record == NULL) return -1; //Se não há mais entradas
@@ -292,8 +290,6 @@ int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 	dentry->fileType = record->TypeVal;
 	dentry->fileSize = record->bytesFileSize;
 	ctrl.openDirectoriesArray[handle].currentEntry++;
-	//segfault aqui na segunda vez que roda, então comentei
-	//free(record);
 	return 0;
 }
 
