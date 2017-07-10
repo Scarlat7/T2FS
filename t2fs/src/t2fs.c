@@ -113,29 +113,8 @@ int read2 (FILE2 handle, char *buffer, int size){
 
 	if(readRequestedSectors(handle, actualReadSize, leitura) == ERROR) return ERROR;
 
-	/*for(i = 0; i < n_blocks-end_pointer; i++){
-		mapVBN(mft, i+end_pointer, &currentLB);
-		mapLBN(currentLB, &initial_sector);
-		for(j = 0; j < (ctrl.boot.blockSize - offset); j++){
-			read_sector(initial_sector+ offset+j, escrita+i*BLOCK_SIZE+j*SECTOR_SIZE);
-			remaining--;
-			if(remaining == 0) break;
-		}
-		if(remaining == 0) break;
-	}*/
-
 	memcpy(buffer, leitura+relativeByte, size);
 	ctrl.openFilesArray[handle].currentPointer += actualReadSize;
-
-	/*BYTE *bufferAux;
-	DWORD sectors = bytesToSectors(size);
-	DWORD relativeByte = openFilesArray[handle].currentPointer % SIZE_SECTOR;	
-	
-	bufferAux = malloc(sectors*sizeof(BYTE));
-
-	if(readSectorFile(handle, sectors, bufferAux))
-		memcpy(buffer, bufferAux+relativeByte, size);
-	else return ERROR;	*/
 
 	return actualReadSize;
 }
@@ -146,13 +125,6 @@ int write2(FILE2 handle, char *buffer, int size){
 	if(isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR) <= 0) 
 		return ERROR;
 
-	/*int BLOCK_SIZE = ctrl.boot.blockSize*SECTOR_SIZE;
-	DWORD mft = ctrl.openFilesArray[handle].MFT, currentLB, initial_sector;
-	DWORD n_blocks = ctrl.openFilesArray[handle].bytesSize/(ctrl.boot.blockSize*SECTOR_SIZE)+1;
-	DWORD end_pointer = ctrl.openFilesArray[handle].currentPointer/(ctrl.boot.blockSize*SECTOR_SIZE);
-	DWORD offset = (ctrl.openFilesArray[handle].currentPointer%(ctrl.boot.blockSize*SECTOR_SIZE))/SECTOR_SIZE;
-	int remaining = n_sectors;
-	*/
 	DWORD relativeByte = ctrl.openFilesArray[handle].currentPointer % SECTOR_SIZE;
 
 	DWORD n_sectors = size/SECTOR_SIZE;
@@ -163,32 +135,9 @@ int write2(FILE2 handle, char *buffer, int size){
 
 	if(readRequestedSectors(handle, size, escrita) == ERROR) return ERROR;
 
-	/*for(i = 0; i < n_blocks-end_pointer; i++){
-		mapVBN(mft, i+end_pointer, &currentLB);
-		mapLBN(currentLB, &initial_sector);
-		for(j = 0; j < (ctrl.boot.blockSize - offset); j++){
-			read_sector(initial_sector+ offset+j, escrita+i*BLOCK_SIZE+j*SECTOR_SIZE);
-			remaining--;
-			if(remaining == 0) break;
-		}
-		if(remaining == 0) break;
-	}*/
-
 	memcpy(escrita+relativeByte, buffer, size);
 
 	if(writeRequestedSectors(handle, size, escrita) == ERROR) return ERROR;
-
-	/*remaining = n_sectors;
-	for(i = 0; i < n_blocks-end_pointer; i++){
-		mapVBN(mft, i+end_pointer, &currentLB);
-		mapLBN(currentLB, &initial_sector);
-		for(j = 0; j < (ctrl.boot.blockSize - offset); j++){
-			write_sector(initial_sector+offset+j, escrita+i*BLOCK_SIZE+j*SECTOR_SIZE);
-			remaining--;
-			if(remaining == 0) break;
-		}
-		if(remaining == 0) break;
-	}*/
 
 	ctrl.openFilesArray[handle].bytesSize += updateFileSize(ctrl.openFilesArray[handle], size);
 	ctrl.openFilesArray[handle].currentPointer += size;
@@ -228,7 +177,10 @@ FILE2 create2 (char *filename){
 
 	if((name = getFileName(filename)) == NULL)
 		return ERROR;
-		
+	
+	if(isValidName(name))
+		return ERROR;
+
 	if((mftDir = pathExists(filename, name)) <= 0)
 		return ERROR;
 
@@ -261,7 +213,10 @@ DIR2 mkdir2 (char *pathname){
 
 	if((name = getFileName(pathname)) == NULL)
 		return ERROR;
-		
+
+	if(isValidName(name))
+		return ERROR;
+
 	if((mftDir = pathExists(pathname, name)) <= 0)
 		return ERROR;
 
@@ -275,15 +230,8 @@ DIR2 mkdir2 (char *pathname){
 		return ERROR;
 	
 	free(newRecord);
-
-	if((handle = getHandle(2)) == ERROR)
-		return ERROR;
-
-	ctrl.openDirectoriesArray[handle] = getDir(mftDir, name);
 	
-	if(ctrl.openDirectoriesArray[handle].valid == -1) return 0;
-	
-	return handle + 1;
+	return 0;
 }
 
 int rmdir2 (char *pathname){
@@ -336,7 +284,7 @@ DIR2 opendir2 (char *pathname) {
 
 int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 	struct t2fs_record *record = malloc(sizeof(struct t2fs_record));
-	if(isOpenH(handle - 1, 2) <= 0) return -2; //Se não está aberto
+	if(isOpenH(handle, 2) <= 0) return -2; //Se não está aberto
 	record = findRecord(ctrl.openDirectoriesArray[handle].MFT, NULL, ctrl.openDirectoriesArray[handle].currentEntry);
 	if(record == NULL) return -1; //Se não há mais entradas
 	//Converter record -> dirent2
@@ -351,7 +299,7 @@ int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 
 int closedir2 (DIR2 handle) {
 	//Caso não esteja aberto
-	if(isOpenH(handle - 1, 2) <= 1) return -1;
+	if(isOpenH(handle, 2) <= 1) return -1;
 	ctrl.openDirectoriesArray[handle].valid = -1;
 	return 0;
 }

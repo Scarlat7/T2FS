@@ -86,105 +86,6 @@ int getHandle(int type){
 	return -1;
 }
 
-/*
-int openFile(char *path){
-	struct t2fs_records fileRecord;
-	if(isOpen(path)) return ERROR;
-		
-	OPENFILES newFile;
-	int fileNumber;
-
-	fileRecord = getRecordsFile(path);
-
-	newFile.MFT = fileRecord.MFTNumber;
-	newFile.currentPointer = 0;
-	strcpy(fileRecord.name, path);	
-	newFile.size = fileRecord.bytesFileSize;
-
-	if((fileNumber = getFileNumber())){
-		openFilesArray[fileNumber] = newFile;
-		return fileNumber;
-	}
-	else return ERROR;
-}
-
-struct t2fs_record* getRecordsFile(char *path){
-	char *directorie;
-	char *dummy = malloc(sizeof(path));
-	struct t2fs_record* actualRecord = malloc(sizeof(struct t2fs_record));
-	BYTE *sectors;
-	sectors = (BYTE*)malloc(ctrl.boot.blockSize*SECTOR_SIZE);
-	int i, j;
-	strcpy(dummy, path);
-	DWORD rootBlocks = getFileBlockSize(1);
-	DWORD currentLB, initial_sector;
-	puts("b");
-	printf("RB: %d\n", rootBlocks);
-	directorie = strtok(dummy, "/");
-	printf("%d", registerToSector(12));
-	for(i = 0; i < rootBlocks; i++){
-		puts("a");
-		mapVBN(1, i, &currentLB);
-		printf("LB: %d\n", currentLB);
-		//if(mapLBN(currentLB, &initial_sector) == ERROR)
-		//	return NULL;
-		
-		initial_sector = currentLB*ctrl.boot.blockSize;
-		printf("IS: %d\n", initial_sector);
-		
-		for(j = 0; j < ctrl.boot.blockSize; j++){		
-			read_sector(initial_sector+j, sectors+SECTOR_SIZE*j);
-		}
-		
-		puts("c");
-
-		if((actualRecord = getRecordByName(directorie, sectors)) != NULL)
-			break;
-	}
-	
-	if(actualRecord == NULL)	
-		return NULL;
-
-	if(actualRecord->TypeVal == 1)
-		return actualRecord;
-	puts("e");
-	while((directorie = strtok(NULL, "/"))){
-		for(i = 0; i < actualRecord->blocksFileSize; i++){
-			mapVBN(actualRecord->MFTNumber,i, &currentLB);
-
-			initial_sector = currentLB*ctrl.boot.blockSize;
-
-			for(j = 0; j < ctrl.boot.blockSize; j++){
-				read_sector(initial_sector+j, sectors+SECTOR_SIZE*j);
-			}
-			puts("g");
-			if((actualRecord = getRecordByName(directorie, sectors)) != NULL)
-				break;
-		}
-		if(actualRecord->TypeVal == 1)
-			return actualRecord;
-	}
-	return NULL;
-}
-
-struct t2fs_record* getRecordByName(char *name, BYTE *sectors){
-	int RECORD_SIZE = sizeof(struct t2fs_record);	
-	int N_RECORDS = SECTOR_SIZE/RECORD_SIZE;
-	int i;
-	for(i = 0; i < sizeof(sectors); i++){
-		printf("%c", *(sectors+i));
-	}
-	struct t2fs_record* actual_record = malloc(RECORD_SIZE);
-	
-	for(i = 0; i < N_RECORDS; i++){
-		memcpy(actual_record, sectors+RECORD_SIZE*i, RECORD_SIZE);
-		puts(actual_record->name);
-		if(strcmp(actual_record->name, name) == 0)
-			return actual_record; 
-	}
-	return NULL;
-}
-*****************************************************/
 DWORD updateFileSize(OPENFILE file, DWORD size){
 	int offset = file.currentPointer + size;
 
@@ -229,7 +130,7 @@ int isValidName(char *name){
     if(strlen(name) > 51 || strlen(name) < 0) return 1;
     for(i = 0; i<strlen(name); i++) {
         current = name[i];
-        if((current < 'A' || current > 'z') && (current <'0' || current > '9') && current != '.') return 1;
+        if((current < 'A' || current > 'Z') && (current < 'a' || current > 'z') && (current <'0' || current > '9') && current != '.') return 1;
     }
     return 0;
 }

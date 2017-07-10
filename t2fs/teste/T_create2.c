@@ -8,14 +8,14 @@ int main(){
 	//init_openFilesArray();
 	int handle;
 	char teste[6];
-	strcpy(teste, "/oi.a");
+	strcpy(teste, "/oi.!!a");
 
 	if((handle = create2(teste)) == ERROR) printf("Incapaz de criar /Test\n");
 	printf("********************************************\n");
 	printf("%d\n", handle);
 	printf("********************************************\n");
 
-	if((handle = create2("/oioi.mori:")) == ERROR) printf("Incapaz de criar /Test\n");
+	if((handle = create2("/oioi.mori")) == ERROR) printf("Incapaz de criar /Test\n");
 	printf("********************************************\n");
 	printf("%d\n", handle);
 	printf("********************************************\n");

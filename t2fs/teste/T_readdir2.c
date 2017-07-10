@@ -16,12 +16,12 @@ int main(){
 	strcpy(path3, "/Test/C");
 
 	//Cria o diretório principal, com os 3 subdiretórios dentro dele
-	if((handle = mkdir2(teste)) == ERRO) printf("Incapaz de criar /Test\n");
+	if(mkdir2(teste) == ERRO) printf("Incapaz de criar /Test\n");
 	if(mkdir2(path1) == ERRO) printf("Incapaz de criar %s\n", path1);
 	if(mkdir2(path2) == ERRO) printf("Incapaz de criar %s\n", path2);
 	if(mkdir2(path3) == ERRO) printf("Incapaz de criar %s\n", path3);
 
-	if(isOpen(teste, 2) == 0) handle = opendir2(teste);
+	handle = opendir2(teste);
 
 	for(i = 0; i < 4; i ++) {
 		option = readdir2(handle, &current);
