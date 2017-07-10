@@ -230,15 +230,8 @@ DIR2 mkdir2 (char *pathname){
 		return ERROR;
 	
 	free(newRecord);
-
-	if((handle = getHandle(2)) == ERROR)
-		return ERROR;
-
-	ctrl.openDirectoriesArray[handle] = getDir(mftDir, name);
 	
-	if(ctrl.openDirectoriesArray[handle].valid == -1) return 0;
-	
-	return handle + 1;
+	return 0;
 }
 
 int rmdir2 (char *pathname){
@@ -291,7 +284,7 @@ DIR2 opendir2 (char *pathname) {
 
 int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 	struct t2fs_record *record = malloc(sizeof(struct t2fs_record));
-	if(isOpenH(handle - 1, 2) <= 0) return -2; //Se não está aberto
+	if(isOpenH(handle, 2) <= 0) return -2; //Se não está aberto
 	record = findRecord(ctrl.openDirectoriesArray[handle].MFT, NULL, ctrl.openDirectoriesArray[handle].currentEntry);
 	if(record == NULL) return -1; //Se não há mais entradas
 	//Converter record -> dirent2
@@ -306,7 +299,7 @@ int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 
 int closedir2 (DIR2 handle) {
 	//Caso não esteja aberto
-	if(isOpenH(handle - 1, 2) <= 1) return -1;
+	if(isOpenH(handle, 2) <= 1) return -1;
 	ctrl.openDirectoriesArray[handle].valid = -1;
 	return 0;
 }

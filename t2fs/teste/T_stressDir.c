@@ -10,7 +10,8 @@ int main(){
 	DWORD handle;
 	for(i = 0; i < 51; i++) {
 		sprintf(dir, "/dir%d", i);
-		handle = mkdir2(dir);
+		mkdir2(dir);
+		handle = opendir2(dir);
 		if(handle != -1 && i < 50) printf("Dir%d criado com sucesso. Seu handle é %d\n", i, handle);
 		else if(handle == -1 && i == 50) printf("Muitos diretórios abertos. Dir%d não pôde ser criado.\n", i);
 		else {
