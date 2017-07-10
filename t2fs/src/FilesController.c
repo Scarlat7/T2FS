@@ -254,7 +254,7 @@ int updateRecord(DWORD fatherReg, struct t2fs_record r){
 			for(k = 0; k < RECORDS_IN_SECTOR; k++){
 				if(!strcmp(records[k].name, r.name) && records[k].TypeVal == TYPEVAL_REGULAR){
 					records[k] = r;
-					write_sector(sector, (BYTE *)records);
+					write_sector(sector+j, (BYTE *)records);
 					return 0;
 				}
 			}
@@ -301,7 +301,7 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 	}
 	printf("FatherReg: %d\n", fatherReg);
 #endif
-					write_sector(sector, (BYTE*)records);
+					write_sector(sector+j, (BYTE*)records);
 					return 0;
 				}
 			}
@@ -377,7 +377,7 @@ int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
 					if(read_sector(sector, (unsigned char*) records)) return -1;
 					records[k] = *record;
 					records[k].TypeVal = TYPEVAL_INVALIDO;
-					if(write_sector(sector, (unsigned char*)records)) return -1;
+					if(write_sector(sector+j, (unsigned char*)records)) return -1;
 					//Tenho que rever isso
 					//if(validos == 0) deleteBlocks(fatherReg, &i);
 					return 0;
