@@ -212,7 +212,7 @@ FILE2 open2(char *filename){
 	if((mftDir = pathExists(filename, name)) <= 0)
 		return ERROR;
 
-	if((handle = getHandle(1)) == ERROR)
+	if((handle = getHandle(TYPEVAL_REGULAR)) == ERROR)
 		return ERROR;
 
 	ctrl.openFilesArray[handle] = getFile(mftDir, name);

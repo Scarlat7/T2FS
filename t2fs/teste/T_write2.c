@@ -15,7 +15,7 @@ int main(){
 		printf("Incapaz de criar /Test\n");
 		return -1;
 	}*/
-	if((handle = open2("/oi.a")) == ERROR){
+	if((handle = create2("/oi.a")) == ERROR){
 		printf("Incapaz de criar /Test\n");
 		return -1;
 	}

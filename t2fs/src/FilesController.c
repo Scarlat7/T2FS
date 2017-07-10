@@ -249,7 +249,7 @@ int updateRecord(DWORD fatherReg, struct t2fs_record r){
 		mapLBN(LBN, &sector);
 
 		for(j = 0; j < ctrl.boot.blockSize; j++){
-			read_sector(sector, (BYTE*) records);
+			read_sector(sector+j, (BYTE*) records);
 			
 			for(k = 0; k < RECORDS_IN_SECTOR; k++){
 				if(!strcmp(records[k].name, r.name) && records[k].TypeVal == TYPEVAL_REGULAR){
@@ -289,7 +289,7 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 		mapLBN(LBN, &sector);
 
 		for(j = 0; j < ctrl.boot.blockSize; j++){
-			read_sector(sector, (BYTE*) records);
+			read_sector(sector+j, (BYTE*) records);
 			
 			for(k = 0; k < RECORDS_IN_SECTOR; k++){
 				if(records[k].TypeVal == TYPEVAL_INVALIDO){
@@ -370,14 +370,13 @@ int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
 		mapLBN(LBN, &sector);
 
 		for(j = 0; j < ctrl.boot.blockSize; j++){
-			read_sector(sector, (BYTE*) records);
+			read_sector(sector+j, (BYTE*) records);
 			
 			for(k = 0; k < RECORDS_IN_SECTOR; k++){
-				if(!strcmp(records[k].name, record->name) && records[k].TypeVal == 2){
+				if(!strcmp(records[k].name, record->name) && records[k].TypeVal != TYPEVAL_INVALIDO){
 					if(read_sector(sector, (unsigned char*) records)) return -1;
-					
 					records[k] = *record;
-					records[k].TypeVal = 0;
+					records[k].TypeVal = TYPEVAL_INVALIDO;
 					if(write_sector(sector, (unsigned char*)records)) return -1;
 					//Tenho que rever isso
 					//if(validos == 0) deleteBlocks(fatherReg, &i);
@@ -389,6 +388,7 @@ int rmRecord(DWORD fatherReg, struct t2fs_record *record) {
 		}
 		i++;
 	} while(i < dirSize);
+	
 	return -1;
 
 /*
@@ -543,7 +543,7 @@ DWORD hasFile(char *name, DWORD fatherReg) {
 		mapLBN(LBN, &sector);
 
 		for(j = 0; j < ctrl.boot.blockSize; j++){
-			read_sector(sector, (BYTE*) records);
+			read_sector(sector+j, (BYTE*) records);
 			
 			for(k = 0; k < RECORDS_IN_SECTOR; k++){
 				if(!strcmp(records[k].name, name) && records[k].TypeVal == 2){
@@ -583,10 +583,10 @@ int isOpen(char *name, int type){
 
 	switch(type) {
 		case 1: for(i=0; i < N_OPENFILES; i++)
-			if(strcmp(ctrl.openFilesArray[i].name, name) == 0) return i+1;
+			if(strcmp(ctrl.openFilesArray[i].name, name) == 0 && ctrl.openFilesArray[i].valid != INVALID_PTR) return i+1;
 			break;
 		case 2: for(i=0; i < N_OPENDIRECTORIES; i++)
-			if(strcmp(ctrl.openDirectoriesArray[i].name, name) == 0) return i+1;
+			if(strcmp(ctrl.openDirectoriesArray[i].name, name) == 0 && ctrl.openFilesArray[i].valid != INVALID_PTR) return i+1;
 			break;
 		default: return -1;
 	}
