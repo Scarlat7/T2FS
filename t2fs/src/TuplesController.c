@@ -281,7 +281,7 @@ DWORD findMFT(){
 	}
 
 	fprintf(stderr, "Disk is full, impossible to find a MFT register.\n");
-	return 0;
+	return -1;
 }
 
 int getFileBlockSize(DWORD MFT){

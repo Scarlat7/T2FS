@@ -117,7 +117,7 @@ struct t2fs_record* createFile(char* name, short int typeVal){
 	struct t2fs_record* newRecord = malloc(sizeof(struct t2fs_record));
 	DWORD newMFT, LBN;
 
-	if((newMFT = findMFT()) <= 0)
+	if((newMFT = findMFT()) == ERROR)
 		return NULL;
 
 	if(mapVBN(newMFT, 0, &LBN) < 0)
@@ -389,6 +389,9 @@ DWORD pathExists(char *pathName) {
 	//Verifica se o path até a pasta pai existe
 	while(directories){
 		i = hasFile(directories, reg, TYPEVAL_DIRETORIO);
+		printf("reg %d", i);
+		if(reg == ERROR)
+			return ERROR;
 		reg = i;
 		directories = strtok(NULL, "/");
 	}

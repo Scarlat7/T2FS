@@ -47,11 +47,12 @@ int delete2 (char *filename){
 		return ERROR;
 
 	if((handle = isOpen(name, TYPEVAL_REGULAR)) < 0)
-		return ERROR;
-	else
 		ctrl.openFilesArray[handle-1].valid = -1;
 
-	if((fatherDir = pathExists(filename)) <= 0)
+	if((fatherDir = pathExists(filename)) == ERROR)
+		return ERROR;
+
+	if(hasFile(name, fatherDir, TYPEVAL_REGULAR) == ERROR)
 		return ERROR;
 
 	if((record  = findRecord(fatherDir, name, -1)) == NULL)
@@ -182,7 +183,7 @@ FILE2 open2(char *filename){
 	if(isOpen(name, TYPEVAL_REGULAR)) 
 		return ERROR;
 
-	if((mftDir = pathExists(filename)) <= 0)
+	if((mftDir = pathExists(filename)) == ERROR)
 		return ERROR;
 
 	if((handle = getHandle(TYPEVAL_REGULAR)) == ERROR)
@@ -211,7 +212,7 @@ FILE2 create2 (char *filename){
 	if(isValidName(name))
 		return ERROR;
 
-	if((mftDir = pathExists(filename)) <= 0)
+	if((mftDir = pathExists(filename)) == ERROR)
 		return ERROR;
 
 	if(hasFile(name, mftDir, TYPEVAL_REGULAR) != ERROR)
@@ -251,7 +252,7 @@ int mkdir2 (char *pathname){
 	if(isValidName(name))
 		return ERROR;
 
-	if((mftDir = pathExists(pathname)) <= 0)
+	if((mftDir = pathExists(pathname)) == ERROR)
 		return ERROR;
 
 	if(hasFile(name, mftDir, TYPEVAL_DIRETORIO) != ERROR)
@@ -283,7 +284,7 @@ int rmdir2 (char *pathname){
 	fatherReg = pathExists(pathname);
 	dirReg = hasFile(dirName, fatherReg, TYPEVAL_DIRETORIO);
 	//Se a pasta não existe, retorna erro
-	if(dirReg <= 0) return -1;
+	if(dirReg == ERROR) return -1;
 
 	if(fatherReg > 0) {
 		record = findRecord(fatherReg, dirName, -1);
@@ -310,8 +311,8 @@ DIR2 opendir2 (char *pathname) {
 	if(init == NULL)
 		init_lib();
 	//Verifica se diretório existe
-	if(fatherReg <= 0) return -1;
-	
+	if(fatherReg == ERROR) return -1;
+
 	if(strcmp(pathname, "/") != 0){
 		if(hasFile(dirName, fatherReg, TYPEVAL_DIRETORIO) == -1) return -1;	
 	}else{
