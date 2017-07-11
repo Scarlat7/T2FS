@@ -196,6 +196,9 @@ FILE2 open2(char *filename){
 
 	ctrl.openFilesArray[handle] = getFile(mftDir, name);
 
+	if(ctrl.openFilesArray[handle].valid == ERROR)
+		return ERROR;
+
 	return handle;
 }
 
@@ -233,6 +236,9 @@ FILE2 create2 (char *filename){
 
 	ctrl.openFilesArray[handle] = getFile(mftDir, name);
 	
+	if(ctrl.openFilesArray[handle].valid == ERROR)
+		return ERROR;
+
 	return handle;
 	
 }

@@ -413,7 +413,10 @@ int isOpen(char *name, int type){
 OPENFILE getFile(DWORD fatherReg, char *name){
 	OPENFILE file;
 	struct t2fs_record *record = findRecord(fatherReg, name, -1);
-	if(record == NULL) printf("Deu ruim no findRecord.\n");
+	if(record == NULL){
+		file.valid = -1;
+		printf("Deu ruim no findRecord.\n");
+	}
 	else {
 		file.valid = 1;
 		file.currentPointer = 0;
