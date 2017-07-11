@@ -127,6 +127,8 @@ struct t2fs_record* createFile(char* name, short int typeVal){
 	strcpy(newRecord->name, name);
 	newRecord->blocksFileSize = 1;
 	newRecord->bytesFileSize = 0;
+	if(typeVal == TYPEVAL_DIRETORIO)
+		newRecord->bytesFileSize = newRecord->blocksFileSize*SECTOR_SIZE*ctrl.boot.blockSize;
 	newRecord->MFTNumber = newMFT;	
 	
 	return newRecord;
@@ -161,8 +163,10 @@ int updateRecord(DWORD fatherReg, struct t2fs_record r){
 			read_sector(sector+j, (BYTE*) records);
 			
 			for(k = 0; k < RECORDS_IN_SECTOR; k++){
-				if(!strcmp(records[k].name, r.name) && records[k].TypeVal == TYPEVAL_REGULAR){
+				if(!strcmp(records[k].name, r.name) && records[k].TypeVal != TYPEVAL_INVALIDO){
 					records[k] = r;
+					records[k].blocksFileSize = getFileBlockSize(records[k].MFTNumber);
+					records[k].bytesFileSize = records[k].blocksFileSize*SECTOR_SIZE*ctrl.boot.blockSize;
 					write_sector(sector+j, (BYTE *)records);
 					return 0;
 				}
@@ -375,7 +379,7 @@ DWORD hasFile(char *name, DWORD fatherReg, int type) {
 	return -1;
 }
 
-//Funcionando --- dá pra tirar o *filename
+//Funcionando
 DWORD pathExists(char *pathName) {
 	char path[strlen(pathName)+1];
 	//Manha pra pegar path até antes do file

@@ -218,10 +218,16 @@ FILE2 open2(char *filename){
 /* MAIN AUTHOR: LEONARDO DA LUZ DORNELES - 00262516
 */
 FILE2 create2 (char *filename){
-	char *name;
-	struct t2fs_record* newRecord;
-	DWORD mftDir;
+	char *name, *father, fatherName[strlen(filename)];
+	struct t2fs_record* newRecord, *r;
+	DWORD mftDir, mftFather;
 	FILE2 handle;
+
+	if(filename[0] != '/') return ERROR;
+
+	strcpy(fatherName, filename);
+	father = strrchr(fatherName, '/');
+	*father = '\0';
 
 	if(init == NULL)
 		init_lib();
@@ -231,7 +237,7 @@ FILE2 create2 (char *filename){
 	
 	if(isValidName(name))
 		return ERROR;
-
+	
 	if((mftDir = pathExists(filename)) == ERROR)
 		return ERROR;
 
@@ -243,6 +249,21 @@ FILE2 create2 (char *filename){
 
 	if(addRecord(mftDir, newRecord))
 		return ERROR;
+
+	//se o pai for o root
+	if(fatherName[0] == '\0'){
+		mftFather = -1;
+
+	}else if((mftFather = pathExists(fatherName)) == ERROR){	
+		return ERROR;
+	}else{
+		if((r = findRecord(mftFather, getFileName(fatherName), -1)) == NULL){
+			return ERROR;
+		}
+		if((updateRecord(mftFather, *r)) == ERROR)
+			return ERROR;
+	}
+
 	
 	free(newRecord);
 
@@ -261,9 +282,15 @@ FILE2 create2 (char *filename){
 /* MAIN AUTHOR: LAUREN ROLAN SAMPAIO - 00262517
 */
 int mkdir2 (char *pathname){
-	char *name;
-	struct t2fs_record* newRecord;
-	DWORD mftDir;
+	char *name, *father, fatherName[strlen(pathname)];
+	struct t2fs_record* newRecord, *r;
+	DWORD mftDir, mftFather;
+
+	if(pathname[0] != '/') return ERROR;
+
+	strcpy(fatherName, pathname);
+	father = strrchr(fatherName, '/');
+	*father = '\0';
 	
 	if(init == NULL)
 		init_lib();
@@ -285,6 +312,21 @@ int mkdir2 (char *pathname){
 
 	if(addRecord(mftDir, newRecord))
 		return ERROR;
+
+	//se o pai for o root
+	if(fatherName[0] == '\0'){
+		mftFather = -1;
+
+	}else if((mftFather = pathExists(fatherName)) == ERROR){
+		return ERROR;
+	}else{
+		if((r = findRecord(mftFather, getFileName(fatherName), -1)) == NULL){
+			return ERROR;
+		}
+		if((updateRecord(mftFather, *r)) == ERROR)
+			return ERROR;
+	}
+
 	
 	free(newRecord);
 	
