@@ -186,7 +186,6 @@ int addRecord(DWORD fatherReg, struct t2fs_record *record) {
 	i = 0;
 
 	do{
-		printf("FatherReg: %d\n", fatherReg);
 		mapVBN(fatherReg, i, &LBN);
 		mapLBN(LBN, &sector);
 
@@ -389,7 +388,7 @@ DWORD pathExists(char *pathName) {
 	//Verifica se o path até a pasta pai existe
 	while(directories){
 		i = hasFile(directories, reg, TYPEVAL_DIRETORIO);
-		printf("reg %d", i);
+
 		if(reg == ERROR)
 			return ERROR;
 		reg = i;
@@ -445,7 +444,6 @@ OPENDIRECTORY getDir(DWORD fatherReg, char *name) {
 	}
 	else if(record == NULL) {
 		dir.valid = -1;
-		printf("Deu ruim no findRecord.\n");
 	}
 	else {
 		dir.valid = 1;

@@ -170,12 +170,6 @@ int mapVBN(DWORD MFT, DWORD VBN, DWORD* LBN) {
 		while(i < TUPLES_IN_REG  && bufferT[i].atributeType != FIM_ENCADEAMENTO){
 			//se o VBN procurado está mapeado nessa tupla
 			if(bufferT[i].atributeType == MAPEAMENTO){
-#ifdef DEBUG
-				//printf("Verificar se VBN esta no RANGE da tupla.\n");
-				//printf("\ttupla: VBN %u cont: %d range: %d\n", bufferT[i].virtualBlockNumber, bufferT[i].numberOfContiguosBlocks,
-				//	bufferT[i].virtualBlockNumber + bufferT[i].numberOfContiguosBlocks-1);
-				//printf("\tVBN procurada %u\n",VBN);
-#endif
 				if(isInRange(VBN, bufferT[i])){
 					*LBN = (VBN  - bufferT[i].virtualBlockNumber) + bufferT[i].logicalBlockNumber;
 					return 0;
