@@ -16,21 +16,40 @@
 #define MFT_ROOT 1
 #define ROOT_FATHER 0
 
-/* updates a record with record.name = r.name in fatherReg */
+/* updates a record with record.name = r.name in fatherReg
+* MAIN AUTHOR: NATÁLIA RAMPON
+*/
 int updateRecord(DWORD fatherReg, struct t2fs_record r);
 
-/* le n_sectors do arquivo a partir do currentPointer */
+/* le n_sectors do arquivo a partir do currentPointer 
+* MAIN AUTHOR: LEONARDO DORNELES
+* CO-AUTHOR: NATÁLIA RAMPON 
+*/
 int readRequestedSectors(FILE2 handle, int size, BYTE *leitura);
 
+/*Escreve nos setores correspondentes ao current pointer + size
+* MAIN AUTHOR: LEONARDO DORNELES
+* CO-AUTHOR: NATÁLIA RAMPON 
+*/
 int writeRequestedSectors(FILE2 handle, int size, BYTE *escrita);
 
-/* dado um número de bytes, retorna seu correspondente em blocos ocupados */
+/*
+* Retorna em quantos blocos cabe um número de bytes
+* MAIN AUTHOR: LEONARDO DORNELES
+*/
 DWORD bytesToBlocks(DWORD bytes);
 
-/*retorna o nome do arquivo a partir do path*/
+/*retorna o nome do arquivo a partir do path
+* MAIN AUTHOR: LAUREN ROLAN SAMPAIO
+* CO-AUTHOR: LEONARDO DORNELES
+*/
 char* getFileName(char *filename);
 
-
+/*
+* Atualiza o tamanho do arquivo levando em conta aonde está o current
+* pointer e o quanto foi escrito no arquivo
+* MAIN AUTHOR: NATÁLIA RAMPON
+*/
 DWORD updateFileSize(OPENFILE file, DWORD size);
 
 /*cria um registro mft pro novo arquivo e retorna seu record*/
