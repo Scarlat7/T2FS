@@ -117,8 +117,6 @@ int read2 (FILE2 handle, char *buffer, int size){
 	if(init == NULL)
 		init_lib();
 
-	printf("file bytes size: %d\n", ctrl.openFilesArray[handle].bytesSize);
-
 	if(isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR) <= 0) 
 		return ERROR;
 	if(ctrl.openFilesArray[handle].currentPointer + size > ctrl.openFilesArray[handle].bytesSize){
@@ -128,17 +126,13 @@ int read2 (FILE2 handle, char *buffer, int size){
 	DWORD n_sectors = size/SECTOR_SIZE;
 	if(size%SECTOR_SIZE != 0)
 		n_sectors++;
-
-	printf("1\n");
+	
 	leitura = malloc(n_sectors*SECTOR_SIZE);
 
-	printf("2\n");
-
 	if(readRequestedSectors(handle, actualReadSize, leitura) == ERROR) return ERROR;
-	printf("3\n");
 
 	memcpy(buffer, leitura+relativeByte, size);
-	printf("4\n");
+
 	ctrl.openFilesArray[handle].currentPointer += actualReadSize;
 
 	return actualReadSize;
@@ -315,10 +309,11 @@ DIR2 opendir2 (char *pathname) {
 	
 	if(init == NULL)
 		init_lib();
-
 	//Verifica se diretório existe
 	if(fatherReg <= 0) return -1;
-	if(hasFile(dirName, fatherReg) == -1) return -1;
+	if(fatherReg != MFT_ROOT){
+		if(hasFile(dirName, fatherReg) == -1) return -1;	
+	}
 	//Verifica se está aberto
 	if(isOpen(dirName, 2)) return -1; //Working
 	//Verifica se há espaço

@@ -18,23 +18,23 @@ int readRequestedSectors(FILE2 handle, int size, BYTE *leitura){
 	if(size%SECTOR_SIZE != 0)
 		n_sectors++;
 
-	printf("size na read: %d", size);
-
 	DWORD remaining = n_sectors;
 	int i, j;
 
+	if(remaining == 0)
+		return 0;
+
 	for(i = 0; i < n_blocks-end_pointer; i++){
-		printf("2.a\n");
+		
 		mapVBN(mft, i+end_pointer, &currentLB);
-		printf("2.b\n");
 		mapLBN(currentLB, &initial_sector);
-		printf("2.c\n");
+	
 		for(j = 0; j < (ctrl.boot.blockSize - offset); j++){
-			printf("2.d: init sec: %d offset: %d leitura+%d\n ",initial_sector,offset,i*BLOCK_SIZE+j*SECTOR_SIZE);
+			
 			read_sector(initial_sector+ offset+j, leitura+i*BLOCK_SIZE+j*SECTOR_SIZE);
-			printf("2.e\n");
+		
 			remaining--;
-			printf("remaining: %d\n", remaining);
+
 			if(remaining == 0) break;
 		}
 		if(remaining == 0) break;
@@ -400,11 +400,11 @@ int isOpen(char *name, int type){
 
 	switch(type) {
 		case 1: for(i=0; i < N_OPENFILES; i++)
-			if(strcmp(ctrl.openFilesArray[i].name, name) == 0 && ctrl.openFilesArray[i].valid != INVALID_PTR) return i+1;
-			break;
+					if(strcmp(ctrl.openFilesArray[i].name, name) == 0 && ctrl.openFilesArray[i].valid != INVALID_PTR) return i+1;
+				break;
 		case 2: for(i=0; i < N_OPENDIRECTORIES; i++)
-			if(strcmp(ctrl.openDirectoriesArray[i].name, name) == 0 && ctrl.openFilesArray[i].valid != INVALID_PTR) return i+1;
-			break;
+					if(strcmp(ctrl.openDirectoriesArray[i].name, name) == 0 && ctrl.openDirectoriesArray[i].valid != INVALID_PTR) return i+1;
+				break;
 		default: return -1;
 	}
 	return 0;
@@ -413,10 +413,9 @@ int isOpen(char *name, int type){
 OPENFILE getFile(DWORD fatherReg, char *name){
 	OPENFILE file;
 	struct t2fs_record *record = findRecord(fatherReg, name, -1);
-	if(record == NULL){
+	if(record == NULL || record->TypeVal != TYPEVAL_REGULAR){
 		file.valid = -1;
-		printf("Deu ruim no findRecord.\n");
-	}
+	} 
 	else {
 		file.valid = 1;
 		file.currentPointer = 0;
@@ -432,7 +431,16 @@ OPENFILE getFile(DWORD fatherReg, char *name){
 OPENDIRECTORY getDir(DWORD fatherReg, char *name) {
 	OPENDIRECTORY dir;
 	struct t2fs_record *record = findRecord(fatherReg, name, -1);
-	if(record == NULL) {
+
+	if(fatherReg == MFT_ROOT){
+		dir.valid = 1;
+		dir.currentEntry = 0;
+		dir.blocksSize = getFileBlockSize(fatherReg);
+		dir.bytesSize = dir.blocksSize*SECTOR_SIZE*ctrl.boot.blockSize;
+		dir.MFT = MFT_ROOT;
+		strcpy(dir.name, "");
+	}
+	else if(record == NULL) {
 		dir.valid = -1;
 		printf("Deu ruim no findRecord.\n");
 	}
