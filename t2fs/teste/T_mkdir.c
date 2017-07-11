@@ -17,7 +17,7 @@ int main(){
 	if(mkdir2(path)) printf("Incapaz de criar %s\n", path);
 	printf("********************************************\n");
 	printf("Imprimindo os primeiros records de /Test.\n");
-	printRecords(pathExists(path, "A"));
+	printRecords(pathExists(path));
 	printf("********************************************\n");
 	return 0;
 }
