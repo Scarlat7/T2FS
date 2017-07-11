@@ -6,9 +6,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+int *init;
+
 int close2 (FILE2 handle){
 
 	struct t2fs_record rec;
+
+	if(init == NULL)
+		init_lib();
 
 	if(isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR) <= 0) 
 		return ERROR;
@@ -29,10 +34,14 @@ int close2 (FILE2 handle){
 }
 
 int delete2 (char *filename){
+
 	char* name;
 	DWORD fatherDir;
 	struct t2fs_record *record;
 	FILE2 handle;
+
+	if(init == NULL)
+		init_lib();
 
 	if((name = getFileName(filename)) == NULL)
 		return ERROR;
@@ -64,6 +73,9 @@ int truncate2 (FILE2 handle){
 	DWORD end_block = ctrl.openFilesArray[handle].currentPointer/(ctrl.boot.blockSize*SECTOR_SIZE)+1;
 	DWORD delete_blocks = n_blocks - end_block;
 
+	if(init == NULL)
+		init_lib();
+
 	if(isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR) <= 0) 
 		return ERROR;
 
@@ -77,6 +89,9 @@ int truncate2 (FILE2 handle){
 
 int seek2 (FILE2 handle, DWORD offset){
 	
+	if(init == NULL)
+		init_lib();
+
 	if(isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR) <= 0) 
 		return ERROR;
 	
@@ -99,6 +114,11 @@ int read2 (FILE2 handle, char *buffer, int size){
 	DWORD relativeByte = ctrl.openFilesArray[handle].currentPointer % SECTOR_SIZE;
 	DWORD actualReadSize = size;
 
+	if(init == NULL)
+		init_lib();
+
+	printf("file bytes size: %d\n", ctrl.openFilesArray[handle].bytesSize);
+
 	if(isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR) <= 0) 
 		return ERROR;
 	if(ctrl.openFilesArray[handle].currentPointer + size > ctrl.openFilesArray[handle].bytesSize){
@@ -109,11 +129,16 @@ int read2 (FILE2 handle, char *buffer, int size){
 	if(size%SECTOR_SIZE != 0)
 		n_sectors++;
 
+	printf("1\n");
 	leitura = malloc(n_sectors*SECTOR_SIZE);
 
+	printf("2\n");
+
 	if(readRequestedSectors(handle, actualReadSize, leitura) == ERROR) return ERROR;
+	printf("3\n");
 
 	memcpy(buffer, leitura+relativeByte, size);
+	printf("4\n");
 	ctrl.openFilesArray[handle].currentPointer += actualReadSize;
 
 	return actualReadSize;
@@ -121,6 +146,9 @@ int read2 (FILE2 handle, char *buffer, int size){
 
 int write2(FILE2 handle, char *buffer, int size){
 	BYTE *escrita;
+
+	if(init == NULL)
+		init_lib();
 
 	if(isOpen(ctrl.openFilesArray[handle].name, TYPEVAL_REGULAR) <= 0) 
 		return ERROR;
@@ -151,6 +179,8 @@ FILE2 open2(char *filename){
 	DWORD mftDir;
 	FILE2 handle;
 
+	if(init == NULL)
+		init_lib();
 
 	if((name = getFileName(filename)) == NULL)
 		return ERROR;
@@ -174,6 +204,9 @@ FILE2 create2 (char *filename){
 	struct t2fs_record* newRecord;
 	DWORD mftDir;
 	FILE2 handle;
+
+	if(init == NULL)
+		init_lib();
 
 	if((name = getFileName(filename)) == NULL)
 		return ERROR;
@@ -209,6 +242,9 @@ int mkdir2 (char *pathname){
 	struct t2fs_record* newRecord;
 	DWORD mftDir;
 	
+	if(init == NULL)
+		init_lib();
+
 	if((name = getFileName(pathname)) == NULL)
 		return ERROR;
 
@@ -237,6 +273,9 @@ int rmdir2 (char *pathname){
 	DWORD  fatherReg, dirReg;
 	DWORD block = 1;
 	struct t2fs_record *record;
+
+	if(init == NULL)
+		init_lib();
 	
 	//Caso tente excluir o root, retorna -1
 	if(strcmp(pathname, "/")==0) return -1;	
@@ -268,6 +307,9 @@ DIR2 opendir2 (char *pathname) {
 	char *dirName = getFileName(pathname);
 	DWORD fatherReg = pathExists(pathname);
 	
+	if(init == NULL)
+		init_lib();
+
 	//Verifica se diretório existe
 	if(fatherReg <= 0) return -1;
 	if(hasFile(dirName, fatherReg) == -1) return -1;
@@ -282,6 +324,10 @@ DIR2 opendir2 (char *pathname) {
 
 int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 	struct t2fs_record *record;
+
+	if(init == NULL)
+		init_lib();
+
 	if(isOpenH(handle, 2) <= 0) return -2; //Se não está aberto
 	record = findRecord(ctrl.openDirectoriesArray[handle].MFT, NULL, ctrl.openDirectoriesArray[handle].currentEntry);
 	if(record == NULL) return -1; //Se não há mais entradas
@@ -294,8 +340,12 @@ int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 }
 
 int closedir2 (DIR2 handle) {
+	
+	if(init == NULL)
+		init_lib();
+
 	//Caso não esteja aberto
-	if(isOpenH(handle, 2) <= 1) return -1;
+	if(isOpenH(handle, 2) != 1) return -1;
 	ctrl.openDirectoriesArray[handle].valid = -1;
 	return 0;
 }
@@ -303,6 +353,9 @@ int closedir2 (DIR2 handle) {
 int identify2 (char *name, int size){
 
 	char *str = "Lauren Silva Rolan Sampaio - 00262517\nLeonardo da Luz Dorneles - 00262516\nNatalia Gubiani Rampon - 00262502\n";
+
+	if(init == NULL)
+		init_lib();
 
 	// Nao pode-se copiar um numero negativo de caracteres
 	if(size < 0)

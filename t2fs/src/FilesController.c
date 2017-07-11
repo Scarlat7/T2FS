@@ -18,15 +18,23 @@ int readRequestedSectors(FILE2 handle, int size, BYTE *leitura){
 	if(size%SECTOR_SIZE != 0)
 		n_sectors++;
 
+	printf("size na read: %d", size);
+
 	DWORD remaining = n_sectors;
 	int i, j;
 
 	for(i = 0; i < n_blocks-end_pointer; i++){
+		printf("2.a\n");
 		mapVBN(mft, i+end_pointer, &currentLB);
+		printf("2.b\n");
 		mapLBN(currentLB, &initial_sector);
+		printf("2.c\n");
 		for(j = 0; j < (ctrl.boot.blockSize - offset); j++){
+			printf("2.d: init sec: %d offset: %d leitura+%d\n ",initial_sector,offset,i*BLOCK_SIZE+j*SECTOR_SIZE);
 			read_sector(initial_sector+ offset+j, leitura+i*BLOCK_SIZE+j*SECTOR_SIZE);
+			printf("2.e\n");
 			remaining--;
+			printf("remaining: %d\n", remaining);
 			if(remaining == 0) break;
 		}
 		if(remaining == 0) break;

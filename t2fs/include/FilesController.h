@@ -109,7 +109,7 @@ DWORD hasFile(char *directories, DWORD currentReg);
 **		-1 - in case of any error
 ** @ARGUMENTS: 	[IN - char*] pathname - pathname
 */
-DWORD pathExists(char *pathName, char *fileName);
+DWORD pathExists(char *pathName);
 
 /* Converts LBN into array of records
 ** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517

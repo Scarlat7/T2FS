@@ -49,6 +49,8 @@ typedef struct s_Control {
 
 extern t_control ctrl; 
 
+extern int *init;
+
 /* Initializes library 
 ** Main author: NATÁLIA GUBIANI RAMPON - 00262502
 ** @RETURN: 0 - if executed without errors

@@ -1,12 +1,16 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include "apidisk.h"
 #include "BootController.h"
 
 	t_control ctrl;
 
+	int *init;
+
 int init_lib(){
 	int i;
+	init = malloc(sizeof(int));
 	ctrl.N_OpenFiles = 0;
 	ctrl.N_OpenDirectories = 0;
 	for(i = 0; i < N_OPENFILES; i++) ctrl.openFilesArray[i].valid = -1;

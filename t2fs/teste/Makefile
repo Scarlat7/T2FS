@@ -21,7 +21,6 @@ VBN=mapVBN
 MKDIR=mkdir
 ADD=addRecord
 OPDIR=opendir
-MAIN=main
 CREATE=create2
 WRITE=write2
 OPEN=open2
@@ -42,8 +41,10 @@ STFILE=stressFile
 TT=THETree
 ULT=theUltimateWrite
 RMB=rmBlocks
+MAIN=main
+CECHIN=cechin
 
-all: T_$(INIT) T_$(READBOOT) T_$(VALIDNAME) T_$(SEARCHMFT) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(OPDIR) T_$(CREATE) T_$(WRITE) T_$(OPEN) T_$(READD) T_$(SEEK) T_$(READ) T_$(CLOSED) T_$(DELR) T_$(DELB) T_$(ID) T_$(TRUNC) T_$(RMDIR) T_$(DEL) T_$(CLOSE) T_$(STDIR) T_$(STFILE) T_$(TT) T_$(ULT) T_$(RMB)
+all: T_$(INIT) T_$(READBOOT) T_$(VALIDNAME) T_$(SEARCHMFT) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(OPDIR) T_$(CREATE) T_$(WRITE) T_$(OPEN) T_$(READD) T_$(SEEK) T_$(READ) T_$(CLOSED) T_$(DELR) T_$(DELB) T_$(ID) T_$(TRUNC) T_$(RMDIR) T_$(DEL) T_$(CLOSE) T_$(STDIR) T_$(STFILE) T_$(TT) T_$(ULT) T_$(RMB) $(CECHIN)
 
 T_$(INIT): T_$(INIT).c $(LIB_DIR)/libt2fs.a
 	$(CC) -o T_$(INIT) T_$(INIT).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
@@ -141,5 +142,8 @@ T_$(ULT): T_$(ULT).c $(LIB_DIR)/libt2fs.a
 T_$(RMB): T_$(RMB).c $(LIB_DIR)/libt2fs.a
 	$(CC) -o T_$(RMB) T_$(RMB).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
 
+$(CECHIN): $(CECHIN).c $(LIB_DIR)/libt2fs.a
+	$(CC) -o $(CECHIN) $(CECHIN).c -I$(INC_DIR)/ -L$(LIB_DIR) -lt2fs $(CFLAGS)
+
 clean:
-	rm -rf *.o *~ T_$(INIT) T_$(READBOOT) T_$(SEARCHMFT) T_$(VALIDNAME) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(OPDIR) T_$(CREATE) T_$(WRITE) T_$(OPEN) T_$(READD) T_$(SEEK) T_$(READ) T_$(CLOSED) T_$(DELR) T_$(DELB) T_$(ID) T_$(TRUNC) T_$(RMDIR) T_$(DEL) T_$(CLOSE) T_$(STDIR) T_$(STFILE) T_$(TT) T_$(ULT) T_$(RMB)
+	rm -rf *.o *~ T_$(INIT) T_$(READBOOT) T_$(SEARCHMFT) T_$(VALIDNAME) T_$(PRINTRECORD) T_$(REGSEC) T_$(FIND) T_$(VBN) T_$(MKDIR) T_$(ADD) T_$(OPDIR) T_$(CREATE) T_$(WRITE) T_$(OPEN) T_$(READD) T_$(SEEK) T_$(READ) T_$(CLOSED) T_$(DELR) T_$(DELB) T_$(ID) T_$(TRUNC) T_$(RMDIR) T_$(DEL) T_$(CLOSE) T_$(STDIR) T_$(STFILE) T_$(TT) T_$(ULT) T_$(RMB) $(CECHIN)

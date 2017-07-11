@@ -3,11 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 
-int main(){
+int main(){	
+
 	init_lib();
+
 	//init_openFilesArray();
 	int handle;
-	char teste[6];
+	char teste[20];
 	strcpy(teste, "/oi.!!a");
 
 	if((handle = create2(teste)) == ERROR) printf("Incapaz de criar /Test\n");
