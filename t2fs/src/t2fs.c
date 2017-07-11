@@ -311,14 +311,20 @@ DIR2 opendir2 (char *pathname) {
 		init_lib();
 	//Verifica se diretório existe
 	if(fatherReg <= 0) return -1;
-	if(fatherReg != MFT_ROOT){
+	
+	if(strcmp(pathname, "/") != 0){
 		if(hasFile(dirName, fatherReg, TYPEVAL_DIRETORIO) == -1) return -1;	
+	}else{
+		fatherReg = ROOT_FATHER;
+		strcpy(dirName, "/");
 	}
+
 	//Verifica se está aberto
 	if(isOpen(dirName, 2)) return -1; //Working
 	//Verifica se há espaço
 	newHandle = getHandle(2);
 	if(newHandle == -1) return -1;
+
 	ctrl.openDirectoriesArray[newHandle] = getDir(fatherReg, dirName);
 	return newHandle;
 }

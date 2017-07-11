@@ -14,6 +14,7 @@
 #define END -1
 #define RECORDS_IN_SECTOR 4
 #define MFT_ROOT 1
+#define ROOT_FATHER 0
 
 /* updates a record with record.name = r.name in fatherReg */
 int updateRecord(DWORD fatherReg, struct t2fs_record r);

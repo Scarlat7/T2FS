@@ -432,13 +432,13 @@ OPENDIRECTORY getDir(DWORD fatherReg, char *name) {
 	OPENDIRECTORY dir;
 	struct t2fs_record *record = findRecord(fatherReg, name, -1);
 
-	if(fatherReg == MFT_ROOT){
+	if(fatherReg == ROOT_FATHER){
 		dir.valid = 1;
 		dir.currentEntry = 0;
 		dir.blocksSize = getFileBlockSize(fatherReg);
 		dir.bytesSize = dir.blocksSize*SECTOR_SIZE*ctrl.boot.blockSize;
 		dir.MFT = MFT_ROOT;
-		strcpy(dir.name, "");
+		strcpy(dir.name, name);
 	}
 	else if(record == NULL) {
 		dir.valid = -1;
