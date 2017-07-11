@@ -23,7 +23,6 @@ typedef struct openFile{
 	DWORD blocksSize;
 	DWORD bytesSize;
 	char name[MAX_FILE_NAME_SIZE];
-	char sectorBuffer[SECTOR_SIZE];
 
 }OPENFILE;
 

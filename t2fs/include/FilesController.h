@@ -102,7 +102,7 @@ int rmRecord(DWORD fatherReg, struct t2fs_record *record);
 ** @ARGUMENTS: 	[IN - DWORD] currentReg - MFT register
 **		[IN - char*] directories - pathname
 */
-DWORD hasFile(char *directories, DWORD currentReg);
+DWORD hasFile(char *directories, DWORD currentReg, int type);
 
 /* Verifies if path is valid and return the last MFT register
 ** Main author: LAUREN SILVA ROLAN SAMPAIO - 00262517

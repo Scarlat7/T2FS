@@ -214,7 +214,7 @@ FILE2 create2 (char *filename){
 	if((mftDir = pathExists(filename)) <= 0)
 		return ERROR;
 
-	if(hasFile(name, mftDir) != ERROR)
+	if(hasFile(name, mftDir, TYPEVAL_REGULAR) != ERROR)
 		return ERROR;
 
 	if((newRecord = createFile(name, TYPEVAL_REGULAR)) == NULL)
@@ -254,7 +254,7 @@ int mkdir2 (char *pathname){
 	if((mftDir = pathExists(pathname)) <= 0)
 		return ERROR;
 
-	if(hasFile(name, mftDir) != ERROR)
+	if(hasFile(name, mftDir, TYPEVAL_DIRETORIO) != ERROR)
 		return ERROR;
 
 	if((newRecord = createFile(name, 2)) == NULL)
@@ -281,7 +281,7 @@ int rmdir2 (char *pathname){
 	if(strcmp(pathname, "/")==0) return -1;	
 	//Procura pelo pai
 	fatherReg = pathExists(pathname);
-	dirReg = hasFile(dirName, fatherReg);
+	dirReg = hasFile(dirName, fatherReg, TYPEVAL_DIRETORIO);
 	//Se a pasta não existe, retorna erro
 	if(dirReg <= 0) return -1;
 
@@ -312,7 +312,7 @@ DIR2 opendir2 (char *pathname) {
 	//Verifica se diretório existe
 	if(fatherReg <= 0) return -1;
 	if(fatherReg != MFT_ROOT){
-		if(hasFile(dirName, fatherReg) == -1) return -1;	
+		if(hasFile(dirName, fatherReg, TYPEVAL_DIRETORIO) == -1) return -1;	
 	}
 	//Verifica se está aberto
 	if(isOpen(dirName, 2)) return -1; //Working

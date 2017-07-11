@@ -346,7 +346,7 @@ int LBNToRecord(DWORD LBN, struct t2fs_record* records){
 }
 
 //Funcionando
-DWORD hasFile(char *name, DWORD fatherReg) {
+DWORD hasFile(char *name, DWORD fatherReg, int type) {
 	struct t2fs_record records[RECORDS_IN_SECTOR];
 	DWORD LBN, sector;
 	DWORD i = 0;
@@ -363,7 +363,7 @@ DWORD hasFile(char *name, DWORD fatherReg) {
 			read_sector(sector+j, (BYTE*) records);
 			
 			for(k = 0; k < RECORDS_IN_SECTOR; k++){
-				if(!strcmp(records[k].name, name) && records[k].TypeVal == 2){
+				if(!strcmp(records[k].name, name) && records[k].TypeVal == type){
 					return records[k].MFTNumber;
 				}
 			}
@@ -388,7 +388,7 @@ DWORD pathExists(char *pathName) {
 	DWORD reg = 1, i;
 	//Verifica se o path até a pasta pai existe
 	while(directories){
-		i = hasFile(directories, reg);
+		i = hasFile(directories, reg, TYPEVAL_DIRETORIO);
 		reg = i;
 		directories = strtok(NULL, "/");
 	}
@@ -449,7 +449,7 @@ OPENDIRECTORY getDir(DWORD fatherReg, char *name) {
 		dir.currentEntry = 0;
 		dir.blocksSize = record->blocksFileSize;
 		dir.bytesSize = record->bytesFileSize;
-		dir.MFT = hasFile(name, fatherReg);
+		dir.MFT = hasFile(name, fatherReg, TYPEVAL_DIRETORIO);
 		strcpy(dir.name, record->name);
 	}	
 	return dir;
