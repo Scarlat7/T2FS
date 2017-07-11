@@ -46,12 +46,13 @@ int delete2 (char *filename){
 	if((name = getFileName(filename)) == NULL)
 		return ERROR;
 
-	if((handle = isOpen(name, TYPEVAL_REGULAR)) < 0)
-		return ERROR;
-	else
+	if((handle = isOpen(name, TYPEVAL_REGULAR)) > 0)
 		ctrl.openFilesArray[handle-1].valid = -1;
 
 	if((fatherDir = pathExists(filename)) <= 0)
+		return ERROR;
+
+	if(hasFile(name, fatherDir, TYPEVAL_REGULAR) == ERROR)
 		return ERROR;
 
 	if((record  = findRecord(fatherDir, name, -1)) == NULL)
