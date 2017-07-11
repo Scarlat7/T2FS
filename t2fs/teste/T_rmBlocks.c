@@ -8,12 +8,11 @@ int main(){
 	char teste[7]; // /teste
 	char dir[13]; // /teste/dirXX
 	int i, erro;
-	DWORD handle;
 	strcpy(teste, "/teste");
 	mkdir2(teste);
 	for(i = 0; i < 48; i++) { //O suficiente para encher três blocos
 		sprintf(dir, "/teste/dir%d", i);
-		handle = mkdir2(dir);
+		mkdir2(dir);
 	}
 	//Remove bloco do meio
 	for(i = 16; i < 32; i++) {

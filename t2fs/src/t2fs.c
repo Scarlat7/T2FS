@@ -8,6 +8,8 @@
 
 int *init;
 
+/* MAIN AUTHOR: NATÁLIA GUBIANI RAMPON - 00262502
+*/
 int close2 (FILE2 handle){
 
 	struct t2fs_record rec;
@@ -33,6 +35,8 @@ int close2 (FILE2 handle){
 
 }
 
+/* MAIN AUTHOR: NATÁLIA GUBIANI RAMPON - 00262502
+*/
 int delete2 (char *filename){
 
 	char* name;
@@ -71,6 +75,8 @@ int delete2 (char *filename){
 
 }
 
+/* MAIN AUTHOR: NATÁLIA GUBIANI RAMPON - 00262502
+*/
 int truncate2 (FILE2 handle){
 
 	DWORD n_blocks = ctrl.openFilesArray[handle].bytesSize/(ctrl.boot.blockSize*SECTOR_SIZE)+1;	
@@ -91,6 +97,8 @@ int truncate2 (FILE2 handle){
 	return 0;
 }
 
+/* MAIN AUTHOR: NATÁLIA GUBIANI RAMPON - 00262502
+*/
 int seek2 (FILE2 handle, DWORD offset){
 	
 	if(init == NULL)
@@ -111,7 +119,9 @@ int seek2 (FILE2 handle, DWORD offset){
 	return 0;
 }
 
-
+/* MAIN AUTHOR: LEONARDO DA LUZ DORNELES - 00262516
+** Co-author: NATÁLIA GUBIANI RAMPON - 00262502
+*/
 int read2 (FILE2 handle, char *buffer, int size){
 	
 	BYTE *leitura;
@@ -142,6 +152,9 @@ int read2 (FILE2 handle, char *buffer, int size){
 	return actualReadSize;
 }
 
+/* MAIN AUTHOR: LEONARDO DA LUZ DORNELES - 00262516
+** Co-author: NATÁLIA GUBIANI RAMPON - 00262502
+*/
 int write2(FILE2 handle, char *buffer, int size){
 	BYTE *escrita;
 
@@ -172,6 +185,8 @@ int write2(FILE2 handle, char *buffer, int size){
 	return size;
 }
 
+/* MAIN AUTHOR: LEONARDO DA LUZ DORNELES - 00262516
+*/
 FILE2 open2(char *filename){
 	char *name;
 	DWORD mftDir;
@@ -200,6 +215,8 @@ FILE2 open2(char *filename){
 	return handle;
 }
 
+/* MAIN AUTHOR: LEONARDO DA LUZ DORNELES - 00262516
+*/
 FILE2 create2 (char *filename){
 	char *name;
 	struct t2fs_record* newRecord;
@@ -241,6 +258,8 @@ FILE2 create2 (char *filename){
 	
 }
 
+/* MAIN AUTHOR: LAUREN ROLAN SAMPAIO - 00262517
+*/
 int mkdir2 (char *pathname){
 	char *name;
 	struct t2fs_record* newRecord;
@@ -272,6 +291,8 @@ int mkdir2 (char *pathname){
 	return 0;
 }
 
+/* MAIN AUTHOR: LAUREN ROLAN SAMPAIO - 00262517
+*/
 int rmdir2 (char *pathname){
 	char *dirName = getFileName(pathname);
 	DWORD  fatherReg, dirReg;
@@ -306,6 +327,8 @@ int rmdir2 (char *pathname){
 	return -1;
 }
 
+/* MAIN AUTHOR: LAUREN ROLAN SAMPAIO - 00262517
+*/
 DIR2 opendir2 (char *pathname) {
 	int newHandle;
 	char *dirName = getFileName(pathname);
@@ -333,6 +356,8 @@ DIR2 opendir2 (char *pathname) {
 	return newHandle;
 }
 
+/* MAIN AUTHOR: LAUREN ROLAN SAMPAIO - 00262517
+*/
 int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 	struct t2fs_record *record;
 
@@ -350,6 +375,8 @@ int readdir2 (DIR2 handle, DIRENT2 *dentry) {
 	return 0;
 }
 
+/* MAIN AUTHOR: LAUREN ROLAN SAMPAIO - 00262517
+*/
 int closedir2 (DIR2 handle) {
 	
 	if(init == NULL)
@@ -361,6 +388,8 @@ int closedir2 (DIR2 handle) {
 	return 0;
 }
 
+/* MAIN AUTHOR: NATÁLIA GUBIANI RAMPON - 00262502
+*/
 int identify2 (char *name, int size){
 
 	char *str = "Lauren Silva Rolan Sampaio - 00262517\nLeonardo da Luz Dorneles - 00262516\nNatalia Gubiani Rampon - 00262502\n";
